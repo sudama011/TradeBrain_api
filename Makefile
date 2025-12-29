@@ -30,3 +30,6 @@ clean:
 # 🐳 Docker: (Future use)
 docker-up:
 	docker-compose up -d --build
+	
+db-up:
+	docker-compose up -d db

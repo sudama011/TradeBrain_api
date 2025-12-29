@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api import signals  # We will create this next
+from app.api import signals
 
 app = FastAPI(title="TradeBrain API", version="0.1.0")
 
