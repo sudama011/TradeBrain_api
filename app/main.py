@@ -14,8 +14,8 @@ from app.core.middleware import (
     RequestValidationMiddleware,
     unified_exception_handler,
 )
-from app.db.database import close_db_connections, init_database
 from app.core.security_constants import API_SECURITY_CONFIG
+from app.db.database import close_db_connections, init_database
 
 # Initialize structured logging
 configure_logging()
