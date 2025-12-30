@@ -35,13 +35,5 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES", 24 * 60))
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
 
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
-    GEMINI_API_SECRET: str = os.getenv("GEMINI_API_SECRET", "")
-    TAVILY_API_KEY: str = os.getenv("TAVILY_API_KEY", "")
-
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
-
 
 settings = Settings()

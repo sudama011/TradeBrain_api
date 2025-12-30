@@ -4,6 +4,7 @@ Pydantic schemas for API request/response validation.
 
 from datetime import datetime
 from typing import Optional
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
@@ -43,7 +44,7 @@ class SignalUpdate(BaseModel):
 class SignalResponse(SignalBase):
     """Schema for signal response."""
 
-    id: int = Field(..., description="Signal ID")
+    id: UUID = Field(..., description="Signal ID")
     created_at: datetime = Field(..., description="Creation timestamp")
 
     class Config:

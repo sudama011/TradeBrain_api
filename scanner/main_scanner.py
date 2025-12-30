@@ -68,17 +68,15 @@ async def job():
     print("--- ✅ Scan Complete ---")
 
 
-def schedule_job():
-    """Run job asynchronously."""
-    asyncio.run(job())
+async def main_loop():
+    print("🚀 TradeBrain Scanner Online")
+    await job()  # Run once immediately
 
+    while True:
+        # Simple async scheduler logic
+        await asyncio.sleep(1800)  # 30 minutes
+        await job()
 
-# Schedule it
-schedule.every(30).minutes.do(schedule_job)
 
 if __name__ == "__main__":
-    print("🚀 TradeBrain Scanner Online")
-    schedule_job()  # Run once immediately
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
+    asyncio.run(main_loop())

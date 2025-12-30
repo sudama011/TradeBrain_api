@@ -108,7 +108,7 @@ INPUT_VALIDATION_CONFIG: Dict[str, Any] = {
 
 PASSWORD_POLICY: Dict[str, Any] = {
     "min_length": 8,
-    "max_length": 128,
+    "max_length": 72,
     "require_uppercase": True,
     "require_lowercase": True,
     "require_digits": True,
