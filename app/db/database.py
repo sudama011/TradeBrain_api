@@ -88,6 +88,7 @@ async def init_database(seed_data: bool = True) -> None:
     try:
         # We use run_sync because create_all is a synchronous method
         async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.drop_all)  # Uncomment this line to drop all
             await conn.run_sync(Base.metadata.create_all)
 
         logger.info("Database tables verified/created successfully.")

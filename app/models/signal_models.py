@@ -1,14 +1,11 @@
-from datetime import datetime, timezone
+from sqlalchemy import Column, Float, Integer, String, Text
 
-from sqlalchemy import Column, DateTime, Float, Integer, String, Text
-
-from app.db.database import Base
+from app.models.base_models import BaseModel
 
 
-class Signal(Base):
+class Signal(BaseModel):
     __tablename__ = "signals"
 
-    id = Column(Integer, primary_key=True, index=True)
     ticker = Column(String, index=True, nullable=False)  # e.g., "TATASTEEL"
     action = Column(String, nullable=False)  # "BUY", "SELL", "HOLD"
     confidence = Column(Integer, nullable=False)  # 0 to 100
@@ -19,5 +16,3 @@ class Signal(Base):
 
     reasoning = Column(Text, nullable=False)  # The AI's explanation
     source_url = Column(String, nullable=True)  # Link to news source
-
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)
