@@ -233,7 +233,17 @@ def is_bot_request(request: Request) -> bool:
 
 
 def get_request_context(request: Request) -> Dict[str, Any]:
-    """Get comprehensive request context for logging."""
+    """Get essential request context for logging."""
+    return {
+        "method": request.method,
+        "path": request.url.path,
+        "client_ip": get_client_ip(request),
+        "query_params": dict(request.query_params) if request.query_params else None,
+    }
+
+
+def get_request_context_full(request: Request) -> Dict[str, Any]:
+    """Get comprehensive request context for detailed logging (debugging only)."""
     client_info = extract_client_info(request)
     user_agent_info = parse_user_agent(client_info["user_agent"])
 

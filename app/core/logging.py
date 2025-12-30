@@ -151,7 +151,6 @@ def log_api_request(
     sanitized_kwargs = sanitize_log_data(kwargs)
     logger.info(
         "API request started",
-        event_type="api_request",
         method=method,
         path=path,
         **sanitized_kwargs,
@@ -178,11 +177,10 @@ def log_api_response(
 
     getattr(logger, log_level)(
         "API response completed",
-        event_type="api_response",
         method=method,
         path=path,
         status_code=status_code,
-        response_time=response_time,
+        response_time=f"{response_time:.3f}s",
         performance_class=performance_class,
         **sanitized_kwargs,
     )
