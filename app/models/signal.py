@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from sqlalchemy import Column, DateTime, Float, Integer, String, Text
 
-from app.core.database import Base
+from app.db.database import Base
 
 
 class Signal(Base):
@@ -20,4 +20,4 @@ class Signal(Base):
     reasoning = Column(Text, nullable=False)  # The AI's explanation
     source_url = Column(String, nullable=True)  # Link to news source
 
-    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), nullable=False)

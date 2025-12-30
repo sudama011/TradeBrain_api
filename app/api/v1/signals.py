@@ -3,10 +3,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select  # Crucial import for Async V2 style
 
 import app.models.signal as models
-from app.core.database import get_db  # Import from new location
 from app.core.exceptions import DatabaseError
 from app.core.logging import get_logger
-from app.schemas.schemas import SignalListResponse, SignalResponse
+from app.db.database import get_db  # Import from new location
+from app.schemas.signal import SignalListResponse
 
 router = APIRouter()
 logger = get_logger(__name__)

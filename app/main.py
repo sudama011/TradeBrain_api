@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import api_router
 from app.core.config import settings
-from app.core.database import close_db_connections, init_database
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import (
     AuthenticationMiddleware,
@@ -15,6 +14,8 @@ from app.core.middleware import (
     RequestValidationMiddleware,
     unified_exception_handler,
 )
+from app.db.database import close_db_connections, init_database
+from app.core.security_constants import API_SECURITY_CONFIG
 
 # Initialize structured logging
 configure_logging()
@@ -53,10 +54,10 @@ app.add_middleware(RequestValidationMiddleware)
 app.add_middleware(AuthenticationMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS or ["*"],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_origins=API_SECURITY_CONFIG["allowed_origins"],
+    allow_credentials=API_SECURITY_CONFIG["allow_credentials"],
+    allow_methods=API_SECURITY_CONFIG["allowed_methods"],
+    allow_headers=API_SECURITY_CONFIG["allowed_headers"],
 )
 app.add_middleware(ExceptionHandlerMiddleware)
 
