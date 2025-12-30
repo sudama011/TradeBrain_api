@@ -66,18 +66,19 @@ class BaseAPIException(Exception):
 
 class ValidationError(BaseAPIException):
     """Input validation error exception."""
+
     def __init__(
         self,
         message: str = "Validation failed",
         details: Optional[Dict[str, Any]] = None,
-        **kwargs, 
+        **kwargs,
     ):
         super().__init__(
-            message=message, 
-            status_code=status.HTTP_400_BAD_REQUEST, 
-            error_type="validation_error", 
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error_type="validation_error",
             details=details,
-            **kwargs
+            **kwargs,
         )
 
 
@@ -131,16 +132,18 @@ class ExternalServiceError(BaseAPIException):
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             error_type="service_unavailable",
             details={"service": service, "original_error": str(error)},
-            **kwargs
+            **kwargs,
         )
 
 
 # --- Async Utilities ---
 
+
 def handle_exceptions(operation_type: str = "service") -> Callable:
     """
     Async Decorator: Catches errors in async functions and converts them to API exceptions.
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -152,7 +155,9 @@ def handle_exceptions(operation_type: str = "service") -> Callable:
                 api_exception = BaseAPIException.from_exception(e)
                 api_exception.details.update({f"{operation_type}_operation": func.__name__})
                 raise api_exception
+
         return wrapper
+
     return decorator
 
 
