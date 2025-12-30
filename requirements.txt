@@ -9,3 +9,13 @@ yfinance
 tavily-python
 google-genai
 schedule
+structlog
+
+# --- Dev Tools ---
+black
+isort
+flake8
+mypy
+autopep8
+types-requests
+types-python-dateutil

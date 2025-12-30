@@ -1,13 +1,15 @@
-import google.genai as genai
 import json
 
+import google.genai as genai
+
 client = genai.Client()
+
 
 def analyze_opportunity(ticker, market_data, news_context):
     """
     Sends data to Gemini 1.5 Flash and returns a JSON decision.
     """
-    
+
     prompt = f"""
     ROLE: You are a strict, cynical financial analyst. You only care about FACTS.
     
@@ -33,15 +35,12 @@ def analyze_opportunity(ticker, market_data, news_context):
         "stop_loss": 0.0
     }}
     """
-    
+
     try:
-        response = response = client.models.generate_content(
-            model="gemini-2.5-flash", contents=prompt
-        )
-        text = response.text.replace('```json', '').replace('```', '').strip()
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
+        text = response.text.replace("```json", "").replace("```", "").strip()
         print(text)
         return json.loads(text)
     except Exception as e:
         print(f"❌ AI Error for {ticker}: {e}")
         return None
-    
