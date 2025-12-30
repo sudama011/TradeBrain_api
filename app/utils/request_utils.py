@@ -240,28 +240,3 @@ def get_request_context(request: Request) -> Dict[str, Any]:
         "client_ip": get_client_ip(request),
         "query_params": dict(request.query_params) if request.query_params else None,
     }
-
-
-def get_request_context_full(request: Request) -> Dict[str, Any]:
-    """Get comprehensive request context for detailed logging (debugging only)."""
-    client_info = extract_client_info(request)
-    user_agent_info = parse_user_agent(client_info["user_agent"])
-
-    return {
-        "method": request.method,
-        "url": str(request.url),
-        "path": request.url.path,
-        "query_params": dict(request.query_params),
-        "client_ip": client_info["ip_address"],
-        "user_agent": client_info["user_agent"],
-        "browser": user_agent_info["browser"],
-        "os": user_agent_info["os"],
-        "device_type": user_agent_info["device_type"],
-        "is_mobile": is_mobile_request(request),
-        "is_bot": is_bot_request(request),
-        "api_version": extract_api_version(request),
-        "request_size": get_request_size(request),
-        "fingerprint": get_request_fingerprint(request),
-        "referer": client_info["referer"],
-        "origin": client_info["origin"],
-    }
