@@ -30,6 +30,10 @@ class RequestResponseLoggingMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         correlation_id = request_id_ctx.get()
+        # Generate correlation ID if not already set
+        if not correlation_id:
+            correlation_id = str(uuid.uuid4())
+            request_id_ctx.set(correlation_id)
         start_time = time.time()
         request_context = get_request_context(request)
         log_api_request(**request_context)
@@ -53,13 +57,20 @@ class RequestResponseLoggingMiddleware(BaseHTTPMiddleware):
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
+        # Skip authentication for documentation endpoints
+        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json", "/")):
+            return await call_next(request)
+
         header_key = request.headers.get("x-api-key")
 
-        if not header_key or request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
+        # API key is required for protected endpoints if configured
+        if not header_key:
+            if settings.API_KEY:  # Only enforce if API_KEY is set
+                raise HTTPException(status_code=401, detail="Missing API key")
             return await call_next(request)
 
         if header_key != settings.API_KEY:
-            raise HTTPException(status_code=401, detail="Unauthorized")
+            raise HTTPException(status_code=401, detail="Invalid API key")
 
         return await call_next(request)
 

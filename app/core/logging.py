@@ -8,7 +8,6 @@ security event logging, and performance monitoring.
 import logging
 import sys
 from contextvars import ContextVar
-from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
 import structlog
@@ -25,8 +24,7 @@ def add_core_metadata_processor(_, __, event_dict: Dict[str, Any]) -> Dict[str, 
     """Processor to add core service metadata to every log entry."""
     event_dict.update(
         {
-            "service": settings.APP_NAME,
-            "version": settings.API_VERSION,
+            "api_version": settings.API_VERSION,
             "environment": settings.ENVIRONMENT,
         }
     )

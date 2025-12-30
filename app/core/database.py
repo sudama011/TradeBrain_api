@@ -90,10 +90,10 @@ async def init_database(seed_data: bool = False) -> None:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
 
-        logger.info("✅ Database tables verified/created successfully.")
+        logger.info("Database tables verified/created successfully.")
 
     except Exception as e:
-        logger.error(f"❌ Database initialization failed: {e}")
+        logger.error("Database initialization failed", error=str(e), exc_info=True)
         raise e
 
 
@@ -103,6 +103,6 @@ async def close_db_connections() -> None:
     """
     try:
         await engine.dispose()
-        logger.info("✅ Database connections closed.")
+        logger.info("Database connections closed successfully.")
     except Exception as e:
-        logger.error(f"❌ Error closing database connections: {e}")
+        logger.error("Error closing database connections", error=str(e), exc_info=True)
