@@ -3,6 +3,7 @@ from typing import Any, Dict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.exceptions import AuthenticationError, handle_exceptions
 from app.core.logging import get_logger
 from app.core.security import (
@@ -34,8 +35,9 @@ class UserAuthenticationService:
 
         return LoginResponse(
             access_token=access_token,
-            token_type="bearer",
+            access_token_expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
             refresh_token=refresh_token,
+            refresh_token_expires_in=settings.REFRESH_TOKEN_EXPIRE_MINUTES * 60,
             user={
                 "id": str(user.id),
                 "email": user.email,
@@ -71,5 +73,5 @@ class UserAuthenticationService:
         return {"message": "Successfully logged out", "success": True}
 
 
-# Singleton instance for easy import and use
+# Singleton instance
 auth_service = UserAuthenticationService()

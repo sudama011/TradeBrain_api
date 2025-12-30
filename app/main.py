@@ -54,10 +54,10 @@ app.add_middleware(RequestValidationMiddleware)
 app.add_middleware(AuthenticationContextMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=API_SECURITY_CONFIG["allowed_origins"],
+    allow_origins=API_SECURITY_CONFIG["cors_origins"],
     allow_credentials=API_SECURITY_CONFIG["allow_credentials"],
-    allow_methods=API_SECURITY_CONFIG["allowed_methods"],
-    allow_headers=API_SECURITY_CONFIG["allowed_headers"],
+    allow_methods=API_SECURITY_CONFIG["cors_methods"],
+    allow_headers=API_SECURITY_CONFIG["cors_headers"],
 )
 app.add_middleware(ExceptionHandlerMiddleware)
 

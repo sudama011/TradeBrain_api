@@ -4,14 +4,13 @@ Extends base repository with user-specific queries and operations.
 """
 
 from typing import Optional
-from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import handle_exceptions
 from app.db.query_builder import AsyncQueryBuilder
 from app.models import User
-from app.repositories import BaseRepository
+from app.repositories.base_repository import BaseRepository
 
 
 class UserRepository(BaseRepository[User]):
@@ -24,7 +23,7 @@ class UserRepository(BaseRepository[User]):
         return await query_builder.filter_by_fields({"email": email}).first()
 
     @handle_exceptions(operation_type="database")
-    async def create(self, user: any, session: AsyncSession) -> User:
+    async def create(self, user: User, session: AsyncSession) -> User:
         """Create a new user."""
         session.add(user)
         await session.commit()
@@ -32,5 +31,5 @@ class UserRepository(BaseRepository[User]):
         return user
 
 
-# Singleton instance for easy import and use
+# Singleton instance
 user_repository = UserRepository()

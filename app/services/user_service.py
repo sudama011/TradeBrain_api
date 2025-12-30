@@ -65,5 +65,5 @@ class UserService:
         return response
 
 
-# Singleton instance for easy import and use
+# Singleton instance
 user_service = UserService()

@@ -67,7 +67,7 @@ class AuthenticationContextMiddleware(BaseHTTPMiddleware):
             try:
                 payload = decode_token(token)
                 if payload and payload.get("type") == "access":
-                    jti = payload.get("jti")
+                    # jti = payload.get("jti")
                     user_email = payload.get("sub")
                     user_id_ctx.set(user_email)
             except Exception:

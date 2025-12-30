@@ -49,7 +49,7 @@ async def seed_database(seed: bool = True) -> None:
             session.commit()
             logger.info("Database seeding successful.")
 
-    except Exception as e:
+    except Exception:
         raise
 
 

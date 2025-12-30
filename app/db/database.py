@@ -7,7 +7,6 @@ from sqlalchemy.pool import StaticPool
 from app.core.config import settings
 from app.core.exceptions import DatabaseError
 from app.core.logging import get_logger
-from app.db.seeding import seed_database
 
 logger = get_logger(__name__)
 
@@ -94,6 +93,8 @@ async def init_database(seed_data: bool = True) -> None:
         logger.info("Database tables verified/created successfully.")
 
         try:
+            from app.db.seeding import seed_database
+
             await seed_database(seed=seed_data)
         except Exception as e:
             logger.error("Failed to seed database", error=str(e), exc_info=True)
