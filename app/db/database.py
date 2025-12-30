@@ -70,7 +70,7 @@ Base = declarative_base()
 
 
 # --- Dependency Injection ---
-async def get_db() -> AsyncGenerator[AsyncSession, None]:
+async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """
     FastAPI Dependency: Yields an async database session.
     """

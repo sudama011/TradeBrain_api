@@ -94,6 +94,24 @@ class AuthenticationError(BaseAPIException):
         )
 
 
+class AuthorizationError(BaseAPIException):
+    """Authorization error exception."""
+
+    def __init__(
+        self,
+        message: str = "Insufficient permissions",
+        required_permission: str = None,
+        **kwargs,
+    ):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_403_FORBIDDEN,
+            error_type="authorization_error",
+            required_permission=required_permission,
+            **kwargs,
+        )
+
+
 class NotFoundError(BaseAPIException):
     """Resource not found exception."""
 
@@ -189,7 +207,7 @@ async def safe_execute(
 
 ERROR_MAPPING = {
     ValueError: ValidationError,
-    PermissionError: AuthenticationError,
+    PermissionError: AuthorizationError,
     FileNotFoundError: NotFoundError,
     KeyError: NotFoundError,
     SQLAlchemyError: DatabaseError,

@@ -13,7 +13,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.security import get_password_hash
-from app.models.user import User
+from app.models.user_models import User
 from app.utils.formatters import normalize_email
 
 logger = get_logger(__name__)
