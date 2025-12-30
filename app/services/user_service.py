@@ -7,7 +7,9 @@ using the repository pattern and authentication service.
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import BusinessLogicError, NotFoundError, get_logger, get_password_hash, handle_exceptions
+from app.core.exceptions import BusinessLogicError, NotFoundError, handle_exceptions
+from app.core.logging import get_logger
+from app.core.security import get_password_hash
 from app.models import User
 from app.repositories.base_repository import RelationshipLoading
 from app.repositories.user_repository import UserRepository
@@ -25,7 +27,7 @@ class UserService:
     @handle_exceptions(operation_type="user_service")
     async def get_user_by_email(self, email: str, session: AsyncSession) -> UserResponse:
         """Get user by email and return as UserResponse including account if present."""
-        user = await self.user_repository.get_by_email_with_account(email, session)
+        user = await self.user_repository.get_by_email(email, session)
         if user is None:
             raise NotFoundError("User not found")
         return UserResponse.model_validate(user, from_attributes=True)
@@ -63,5 +65,5 @@ class UserService:
         return response
 
 
-# Global service instance
+# Singleton instance for easy import and use
 user_service = UserService()

@@ -10,7 +10,9 @@ from typing import Any, Dict
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from app.core import get_logger, get_password_hash, settings
+from app.core.config import settings
+from app.core.logging import get_logger
+from app.core.security import get_password_hash
 from app.models import User
 from app.utils import normalize_email
 

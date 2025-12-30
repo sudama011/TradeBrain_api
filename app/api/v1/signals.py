@@ -2,7 +2,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from app.core import DatabaseError, get_logger, get_session
+from app.core.dependencies import get_session
+from app.core.exceptions import DatabaseError
+from app.core.logging import get_logger
 from app.models import Signal
 from app.schemas import PaginatedResponse, SignalResponse
 

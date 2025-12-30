@@ -3,13 +3,12 @@ from typing import Any, Dict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import (
-    AuthenticationError,
+from app.core.exceptions import AuthenticationError, handle_exceptions
+from app.core.logging import get_logger
+from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
-    get_logger,
-    handle_exceptions,
     verify_password,
 )
 from app.repositories.user_repository import UserRepository
@@ -72,5 +71,5 @@ class UserAuthenticationService:
         return {"message": "Successfully logged out", "success": True}
 
 
-# Global service instance
+# Singleton instance for easy import and use
 auth_service = UserAuthenticationService()

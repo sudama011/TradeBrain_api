@@ -8,7 +8,8 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import get_logger, get_session, oauth2_scheme
+from app.core.dependencies import get_session, oauth2_scheme
+from app.core.logging import get_logger
 from app.schemas import LoginResponse, RefreshTokenRequest, RefreshTokenResponse
 from app.services.auth_service import auth_service
 

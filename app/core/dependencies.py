@@ -4,14 +4,18 @@ Core dependencies for FastAPI dependency injection.
 Provides authentication, authorization, and database session dependencies.
 """
 
-from typing import Annotated, Any, Optional
+from typing import Annotated, Optional
 
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import AuthenticationError, AuthorizationError, NotFoundError, decode_token, get_logger
+from app.core.config import settings
+from app.core.exceptions import AuthenticationError, AuthorizationError, NotFoundError
+from app.core.security import decode_token, get_logger
 from app.db.database import get_session
+from app.models import User, UserRole
+from app.repositories import user_repository
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 logger = get_logger(__name__)
@@ -46,13 +50,9 @@ async def get_current_user_email(
 async def get_current_user(
     user_email: Annotated[str, Depends(get_current_user_email)],
     session: Annotated[AsyncSession, Depends(get_session)],
-) -> Optional[Any]:
+) -> Optional[User]:
     """Get current authenticated user from database."""
     try:
-        # Import here to avoid circular imports
-        from app.repositories.user_repository import UserRepository
-
-        user_repository = UserRepository(None)  # Model will be set when needed
         user = await user_repository.get_by_email(user_email, session)
 
         if not user:
@@ -66,10 +66,8 @@ async def get_current_user(
         raise AuthenticationError("Error retrieving user information")
 
 
-def require_admin(current_user: Annotated[Any, Depends(get_current_user)]) -> Any:
-    """Require admin role for access."""
-    # Check if user has admin attribute/role
-    if not hasattr(current_user, "role") or current_user.role != "admin":
+def require_admin(current_user: Annotated[User, Depends(get_current_user)]) -> Optional[User]:
+    if not hasattr(current_user, "role") or current_user.role != UserRole.ADMIN.value:
         logger.warning(
             "Admin access denied",
             user_id=str(getattr(current_user, "id", "unknown")),

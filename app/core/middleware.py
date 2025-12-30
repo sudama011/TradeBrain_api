@@ -7,15 +7,17 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core import BaseAPIException, decode_token, get_logger
+from app.core.exceptions import BaseAPIException
 from app.core.logging import (
     clear_request_context,
+    get_logger,
     log_api_request,
     log_api_response,
     log_security_event,
     request_id_ctx,
     user_id_ctx,
 )
+from app.core.security import decode_token
 from app.utils import get_client_ip, get_request_context
 
 logger = get_logger(__name__)

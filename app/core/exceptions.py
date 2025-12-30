@@ -5,7 +5,7 @@ from fastapi import status
 from sqlalchemy.exc import DatabaseError as SQLAlchemyDatabaseError
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core import get_logger, sanitize_log_data
+from app.core.logging import get_logger, sanitize_log_data
 
 logger = get_logger(__name__)
 
@@ -154,7 +154,6 @@ class DatabaseError(BaseAPIException):
 
 
 class ExternalServiceError(BaseAPIException):
-    # Fixed: Added **kwargs
     def __init__(self, service: str, error: str, **kwargs):
         super().__init__(
             message=f"{service} service failed",

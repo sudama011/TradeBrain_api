@@ -10,7 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, load_only, noload, selectinload, subqueryload
 from sqlalchemy.sql.selectable import Select
 
-from app.core import get_logger, handle_exceptions
+from app.core.exceptions import handle_exceptions
+from app.core.logging import get_logger
 from app.schemas import (
     PaginatedResponse,
     PaginationParams,

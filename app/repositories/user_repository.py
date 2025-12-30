@@ -8,10 +8,10 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core import handle_exceptions
+from app.core.exceptions import handle_exceptions
 from app.db.query_builder import AsyncQueryBuilder
 from app.models import User
-from app.repositories.base_repository import BaseRepository
+from app.repositories import BaseRepository
 
 
 class UserRepository(BaseRepository[User]):
@@ -30,3 +30,7 @@ class UserRepository(BaseRepository[User]):
         await session.commit()
         await session.refresh(user)
         return user
+
+
+# Singleton instance for easy import and use
+user_repository = UserRepository()

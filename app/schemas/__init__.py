@@ -3,6 +3,7 @@ from app.schemas.common_schemas import (
     PaginatedResponse,
     PaginationMeta,
     PaginationParams,
+    SearchParams,
     SortOrderEnum,
     get_paginated_response,
     get_pagination_meta,

@@ -1,10 +1,3 @@
-"""
-Centralized logging configuration with structured logging.
-
-Provides production-ready logging with JSON formatting, correlation IDs,
-security event logging, and performance monitoring.
-"""
-
 import logging
 import sys
 from contextvars import ContextVar
@@ -14,7 +7,7 @@ import structlog
 from structlog.processors import JSONRenderer
 from structlog.stdlib import LoggerFactory
 
-from app.core import settings
+from app.core.config import settings
 
 # Context variables for request correlation
 request_id_ctx: ContextVar[Optional[str]] = ContextVar("request_id", default=None)

@@ -5,7 +5,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import api_router
-from app.core import API_SECURITY_CONFIG, settings
+from app.core.config import settings
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import (
     AuthenticationContextMiddleware,
@@ -14,6 +14,7 @@ from app.core.middleware import (
     RequestValidationMiddleware,
     unified_exception_handler,
 )
+from app.core.security_constants import API_SECURITY_CONFIG
 from app.db.database import close_db_connections, init_database
 
 # Initialize structured logging
