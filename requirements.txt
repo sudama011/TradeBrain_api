@@ -4,6 +4,9 @@ python-dotenv
 requests
 pydantic
 sqlalchemy
+asyncpg
+aiosqlite
+greenlet
 psycopg2-binary
 yfinance
 tavily-python

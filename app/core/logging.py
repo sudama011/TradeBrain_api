@@ -28,7 +28,6 @@ def add_core_metadata_processor(_, __, event_dict: Dict[str, Any]) -> Dict[str, 
             "service": settings.APP_NAME,
             "version": settings.API_VERSION,
             "environment": settings.ENVIRONMENT,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
     )
     return event_dict
@@ -58,7 +57,7 @@ def configure_logging() -> None:
         structlog.stdlib.filter_by_level,
         structlog.stdlib.add_logger_name,
         structlog.stdlib.add_log_level,
-        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.TimeStamper(fmt="iso", utc=True),
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
         structlog.processors.UnicodeDecoder(),

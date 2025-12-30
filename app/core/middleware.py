@@ -53,10 +53,11 @@ class RequestResponseLoggingMiddleware(BaseHTTPMiddleware):
 
 class AuthenticationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        if request.url.path in ["/docs", "/openapi.json", "/redoc"]:
+        header_key = request.headers.get("x-api-key")
+
+        if not header_key or request.url.path.startswith(("/docs", "/redoc", "/openapi.json")):
             return await call_next(request)
 
-        header_key = request.headers.get("x-api-key")
         if header_key != settings.API_KEY:
             raise HTTPException(status_code=401, detail="Unauthorized")
 
@@ -72,7 +73,7 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         if not await self._validate_request_size(request):
             raise HTTPException(
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                status_code=status.HTTP_413_CONTENT_TOO_LARGE,
                 detail="Request payload too large",
             )
 

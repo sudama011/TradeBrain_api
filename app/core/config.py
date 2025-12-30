@@ -17,8 +17,10 @@ class Settings:
     TAVILY_API_KEY: str | None = os.getenv("TAVILY_API_KEY")
     API_KEY: str | None = os.getenv("API_KEY")
 
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./tradebrain.db")
-
+    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./tradebrain.db")
+    DATABASE_ECHO: bool = False
+    DATABASE_POOL_SIZE: int = 5
+    DATABASE_MAX_OVERFLOW: int = 10
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     WORKERS: int = int(os.getenv("WORKERS", 1))
