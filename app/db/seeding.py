@@ -10,11 +10,9 @@ from typing import Any, Dict
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
-from app.core.logging import get_logger
-from app.core.security import get_password_hash
-from app.models.user_models import User
-from app.utils.formatters import normalize_email
+from app.core import get_logger, get_password_hash, settings
+from app.models import User
+from app.utils import normalize_email
 
 logger = get_logger(__name__)
 
@@ -26,7 +24,7 @@ except FileNotFoundError:
 
 
 async def seed_database(seed: bool = True) -> None:
-    if not seed or settings.ENVIRONMENT == "prod":
+    if not seed or not mock_data or mock_data == {} or settings.ENVIRONMENT == "prod":
         logger.info("Seeding skipped....")
         return
 

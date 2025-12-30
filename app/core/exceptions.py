@@ -5,7 +5,7 @@ from fastapi import status
 from sqlalchemy.exc import DatabaseError as SQLAlchemyDatabaseError
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.logging import get_logger
+from app.core import get_logger, sanitize_log_data
 
 logger = get_logger(__name__)
 
@@ -37,8 +37,6 @@ class BaseAPIException(Exception):
 
     def get_log_context(self) -> Dict[str, Any]:
         """Get sanitized context for logging."""
-        from app.core.logging import sanitize_log_data
-
         return {
             "error_type": self.error_type,
             "status_code": self.status_code,
@@ -125,6 +123,19 @@ class NotFoundError(BaseAPIException):
             status_code=status.HTTP_404_NOT_FOUND,
             error_type="not_found",
             details={"resource": resource, "identifier": identifier},
+            **kwargs,
+        )
+
+
+class BusinessLogicError(BaseAPIException):
+    """Business logic validation error exception."""
+
+    def __init__(self, message: str, code: str = None, **kwargs):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            error_type="business_logic_error",
+            code=code,
             **kwargs,
         )
 

@@ -5,7 +5,6 @@ Centralized security configuration including suspicious patterns,
 blocked user agents, and security validation rules.
 """
 
-import os
 import re
 from typing import Any, Dict, List
 

@@ -4,9 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.pool import StaticPool
 
-from app.core.config import settings
-from app.core.exceptions import DatabaseError
-from app.core.logging import get_logger
+from app.core import DatabaseError, get_logger, settings
 from app.db.seeding import seed_database
 
 logger = get_logger(__name__)

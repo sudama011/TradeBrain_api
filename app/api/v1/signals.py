@@ -1,19 +1,17 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select  # Crucial import for Async V2 style
+from sqlalchemy.future import select
 
-import app.models.signal_models as models
-from app.core.exceptions import DatabaseError
-from app.core.logging import get_logger
-from app.db.database import get_db  # Import from new location
-from app.schemas.signal_schemas import SignalListResponse
+from app.core import DatabaseError, get_logger, get_session
+from app.models import Signal
+from app.schemas import PaginatedResponse, SignalResponse
 
 router = APIRouter()
 logger = get_logger(__name__)
 
 
-@router.get("/signals", response_model=SignalListResponse)
-async def get_signals(limit: int = 50, db: AsyncSession = Depends(get_db)):  # Now uses AsyncSession
+@router.get("/signals", response_model=PaginatedResponse[SignalResponse])
+async def get_signals(limit: int = 50, session: AsyncSession = Depends(get_session)):
     """
     Fetches the latest trading signals asynchronously.
     """
@@ -21,21 +19,19 @@ async def get_signals(limit: int = 50, db: AsyncSession = Depends(get_db)):  # N
         if limit <= 0 or limit > 1000:
             limit = 50
 
-        # 1. Create the Query (Select)
-        query = select(models.Signal).order_by(models.Signal.created_at.desc()).limit(limit)
+        query = select(Signal).order_by(Signal.created_at.desc()).limit(limit)
 
-        # 2. Execute Async
-        result = await db.execute(query)
+        result = await session.execute(query)
 
-        # 3. Convert to List (Scalars returns the objects, not rows)
         signals = result.scalars().all()
 
         logger.info("fetched_signals_async", count=len(signals), limit=limit)
 
-        return SignalListResponse(
-            status="success",
-            count=len(signals),
-            data=signals,
+        return PaginatedResponse[SignalResponse](
+            items=[SignalResponse.model_validate(signal, from_attributes=True) for signal in signals],
+            total=len(signals),
+            page=1,
+            size=limit,
         )
 
     except Exception as e:

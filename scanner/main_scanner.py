@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import schedule
 
 from app.db.database import AsyncSessionLocal
-from app.models.signal import Signal
+from app.models.signal_models import Signal
 from scanner.agents import analyze_opportunity
 from scanner.tools import get_market_data, get_news_context
 

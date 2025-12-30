@@ -14,10 +14,11 @@ import structlog
 from structlog.processors import JSONRenderer
 from structlog.stdlib import LoggerFactory
 
-from app.core.config import settings
+from app.core import settings
 
 # Context variables for request correlation
 request_id_ctx: ContextVar[Optional[str]] = ContextVar("request_id", default=None)
+user_id_ctx: ContextVar[Optional[str]] = ContextVar("user_id", default=None)
 
 
 def add_core_metadata_processor(_, __, event_dict: Dict[str, Any]) -> Dict[str, Any]:

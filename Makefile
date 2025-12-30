@@ -23,8 +23,10 @@ help:
 	@echo "  $(GREEN)run$(RESET)           🚀  Run API: Starts the FastAPI server"
 	@echo "  $(GREEN)scan$(RESET)          🕵️  Run Scanner: Starts the background worker"
 	@echo "  $(GREEN)clean$(RESET)         🧹  Clean: Removes cache files"
+	@echo "  $(GREEN)docker-up$(RESET)     🐳  Docker: Builds and starts all services in Docker"
 	@echo "  $(GREEN)db-up$(RESET)         🐘  DB: Starts PostgreSQL in Docker"
 	@echo "  $(GREEN)lint$(RESET)          🔍  Lint: Runs code quality checks"
+	@echo "  $(GREEN)lint-fix$(RESET)      🛠️  Lint: Fixes auto-fixable issues"
 	@echo "  $(GREEN)format$(RESET)        🎨  Format: Auto-formats code with Black"
 
 # --- Core Commands ---

@@ -7,17 +7,16 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core.config import settings
-from app.core.exceptions import BaseAPIException
+from app.core import BaseAPIException, decode_token, get_logger
 from app.core.logging import (
     clear_request_context,
-    get_logger,
     log_api_request,
     log_api_response,
     log_security_event,
     request_id_ctx,
+    user_id_ctx,
 )
-from app.utils.request_utils import get_client_ip, get_request_context
+from app.utils import get_client_ip, get_request_context
 
 logger = get_logger(__name__)
 
@@ -55,24 +54,30 @@ class RequestResponseLoggingMiddleware(BaseHTTPMiddleware):
             clear_request_context()
 
 
-class AuthenticationMiddleware(BaseHTTPMiddleware):
+class AuthenticationContextMiddleware(BaseHTTPMiddleware):
+    """Middleware to set user context for authenticated requests."""
+
     async def dispatch(self, request: Request, call_next):
-        # Skip authentication for documentation endpoints
-        if request.url.path.startswith(("/docs", "/redoc", "/openapi.json", "/")):
+        # Extract token from Authorization header
+        auth_header = request.headers.get("authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            try:
+                payload = decode_token(token)
+                if payload and payload.get("type") == "access":
+                    jti = payload.get("jti")
+                    user_email = payload.get("sub")
+                    user_id_ctx.set(user_email)
+            except Exception:
+                # If token validation fails, continue without setting user context
+                # The actual authentication will be handled by dependencies
+                pass
+
+        try:
             return await call_next(request)
-
-        header_key = request.headers.get("x-api-key")
-
-        # API key is required for protected endpoints if configured
-        if not header_key:
-            if settings.API_KEY:  # Only enforce if API_KEY is set
-                raise HTTPException(status_code=401, detail="Missing API key")
-            return await call_next(request)
-
-        if header_key != settings.API_KEY:
-            raise HTTPException(status_code=401, detail="Invalid API key")
-
-        return await call_next(request)
+        finally:
+            # Context will be cleared by RequestResponseLoggingMiddleware
+            pass
 
 
 class RequestValidationMiddleware(BaseHTTPMiddleware):

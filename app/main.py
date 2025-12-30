@@ -5,16 +5,15 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1 import api_router
-from app.core.config import settings
+from app.core import API_SECURITY_CONFIG, settings
 from app.core.logging import configure_logging, get_logger
 from app.core.middleware import (
-    AuthenticationMiddleware,
+    AuthenticationContextMiddleware,
     ExceptionHandlerMiddleware,
     RequestResponseLoggingMiddleware,
     RequestValidationMiddleware,
     unified_exception_handler,
 )
-from app.core.security_constants import API_SECURITY_CONFIG
 from app.db.database import close_db_connections, init_database
 
 # Initialize structured logging
@@ -51,7 +50,7 @@ app.add_exception_handler(RequestValidationError, unified_exception_handler)
 # Add middleware (order matters - they execute in reverse order)
 app.add_middleware(RequestResponseLoggingMiddleware)
 app.add_middleware(RequestValidationMiddleware)
-app.add_middleware(AuthenticationMiddleware)
+app.add_middleware(AuthenticationContextMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=API_SECURITY_CONFIG["allowed_origins"],
