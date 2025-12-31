@@ -18,7 +18,8 @@ from app.core.logging import (
     user_id_ctx,
 )
 from app.core.security import decode_token
-from app.utils import get_client_ip, get_request_context
+from app.core.security_constants import INPUT_VALIDATION_CONFIG
+from app.utils import extract_bearer_token, get_client_ip, get_request_context, get_request_size
 
 logger = get_logger(__name__)
 
@@ -60,14 +61,12 @@ class AuthenticationContextMiddleware(BaseHTTPMiddleware):
     """Middleware to set user context for authenticated requests."""
 
     async def dispatch(self, request: Request, call_next):
-        # Extract token from Authorization header
-        auth_header = request.headers.get("authorization")
-        if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
+        token = extract_bearer_token(request)
+        if token:
             try:
                 payload = decode_token(token)
                 if payload and payload.get("type") == "access":
-                    # jti = payload.get("jti")
+                    jti = payload.get("jti")
                     user_email = payload.get("sub")
                     user_id_ctx.set(user_email)
             except Exception:
@@ -86,7 +85,6 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
 
     def __init__(self, app):
         super().__init__(app)
-        self.max_request_size = 10 * 1024 * 1024
 
     async def dispatch(self, request: Request, call_next):
         if not await self._validate_request_size(request):
@@ -98,11 +96,11 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
     async def _validate_request_size(self, request: Request) -> bool:
-        content_length = request.headers.get("content-length")
-        if content_length and int(content_length) > self.max_request_size:
+        request_size = get_request_size(request)
+        if request_size and int(request_size) > INPUT_VALIDATION_CONFIG["max_request_size"]:
             log_security_event(
                 event_type="request_too_large",
-                description=f"Request size {content_length} exceeds limit {self.max_request_size}",
+                description=f"Request size {request_size} exceeds limit {INPUT_VALIDATION_CONFIG["max_request_size"]}",
                 client_ip=get_client_ip(request),
                 path=str(request.url.path),
                 method=request.method,
@@ -166,7 +164,7 @@ async def unified_exception_handler(request: Request, exc: Exception):
             message = "Validation failed."
 
         return JSONResponse(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             content={
                 "success": False,
                 "message": message,

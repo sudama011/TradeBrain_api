@@ -1,9 +1,3 @@
-"""
-Database seeding utilities for initial data setup.
-
-Provides functions to create initial admin user and other required data.
-"""
-
 import json
 from typing import Any, Dict
 

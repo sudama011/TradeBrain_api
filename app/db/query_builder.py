@@ -78,7 +78,6 @@ class AsyncQueryBuilder(Generic[T]):
 
     def search(self, params: SearchParams) -> "AsyncQueryBuilder":
         """Build a search query with filters and sorting."""
-        # This can be extended based on your needs
         if "query" in params and "fields" in params:
             search_conditions = [
                 getattr(self.model_class, field).ilike(f"%{params['query']}%")
@@ -92,8 +91,8 @@ class AsyncQueryBuilder(Generic[T]):
             self.filter_by_fields(params["filters"])
 
         if "sort_by" in params and hasattr(self.model_class, params["sort_by"]):
-            sort_order = params.get("sort_order", "asc")
-            if sort_order == "desc":
+            sort_order = params["sort_order"]
+            if sort_order == SortOrderEnum.desc:
                 self._order_by.append(desc(getattr(self.model_class, params["sort_by"])))
             else:
                 self._order_by.append(asc(getattr(self.model_class, params["sort_by"])))
@@ -228,24 +227,21 @@ class AsyncQueryBuilder(Generic[T]):
         return count_result.scalar_one()
 
     @handle_exceptions(operation_type="database")
-    async def paginate(self, page: int = 1, size: int = 10) -> Dict[str, Any]:
+    async def paginate(self, pagination: PaginationParams) -> PaginatedResponse[T]:
         """Apply offset-based pagination to the built query."""
         total = await self.count()
-        if total == 0:
-            return {"items": [], "total": 0, "page": page, "size": size, "pages": 0}
+        if total > 0:
+            query: Select = self._build().offset(pagination.offset).limit(pagination.size)
+            paginated_result = await self.session.execute(query)
 
-        offset = (page - 1) * size
-        query: Select = self._build().offset(offset).limit(size)
+            logger.info(
+                "Paginated query executed successfully",
+                total=total,
+                page=pagination.page,
+                size=pagination.size,
+            )
 
-        paginated_result = await self.session.execute(query)
-
-        logger.info(
-            "Paginated query executed successfully",
-            total=total,
-            page=page,
-            size=size,
-        )
-
-        items = list(paginated_result.scalars().all())
-        pages = (total + size - 1) // size
-        return {"items": items, "total": total, "page": page, "size": size, "pages": pages}
+            items = list(paginated_result.scalars().all())
+        else:
+            items = []
+        return get_paginated_response(items=items, total=total, page=pagination.page, size=pagination.size)

@@ -36,4 +36,5 @@ class Settings(BaseSettings):
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
 
 
+# Global settings instance
 settings = Settings()

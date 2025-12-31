@@ -57,7 +57,7 @@ def configure_logging() -> None:
         structlog.processors.dict_tracebacks,
     ]
 
-    if settings.DEBUG:
+    if settings.ENVIRONMENT == "dev":
         # Use simple processors and console renderer for development
         processors = shared_processors + [structlog.dev.ConsoleRenderer(colors=True)]
     else:
