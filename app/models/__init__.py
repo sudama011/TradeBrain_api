@@ -1,4 +1,3 @@
-from app.models.base_models import UserRole
-from app.models.signal_models import Signal
-from app.models.user_models import User
-from app.models.watchlist_models import WatchlistItem
+from app.models.enums import NotificationType, PlatformType, SetupType, SignalAction, SignalStatus, UserRole
+from app.models.signal_models import Signal, UserSignalFavorite, UserTrade, WatchlistItem
+from app.models.user_models import Notification, User, UserDevice, UserSession, UserSignalFavorite, UserTrade
