@@ -12,6 +12,8 @@ from apscheduler.triggers.cron import CronTrigger
 
 from app.core.config import settings
 from app.core.logging import get_logger
+from app.db.database import AsyncSessionLocal
+from app.scanner.signal_auditor import signal_auditor
 
 logger = get_logger(__name__)
 
@@ -32,6 +34,15 @@ class ScannerScheduler:
     def is_running(self) -> bool:
         """Check if the scheduler is running."""
         return self._is_running and self._scheduler is not None
+
+    async def _run_audit(self) -> None:
+        """Run the signal auditor."""
+        logger.info("scheduled_audit_starting")
+        try:
+            async with AsyncSessionLocal() as session:
+                await signal_auditor.audit_signals(session)
+        except Exception as e:
+            logger.error("scheduled_audit_failed", error=str(e))
 
     def start(self) -> bool:
         """
@@ -70,6 +81,13 @@ class ScannerScheduler:
             trigger=trigger,
             id="market_scanner",
             name="Market Scanner Job",
+            replace_existing=True,
+        )
+        self._scheduler.add_job(
+            self._run_audit,
+            trigger=CronTrigger(minute="30", hour="9-16", day_of_week="mon-fri"),
+            id="signal_auditor",
+            name="Signal Auditor Job",
             replace_existing=True,
         )
 
