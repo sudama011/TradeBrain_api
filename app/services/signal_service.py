@@ -31,13 +31,27 @@ class SignalService:
         pagination: PaginationParams,
         ticker: Optional[str] = None,
         action: Optional[str] = None,
+        min_confidence: Optional[int] = None,
+        days_old: Optional[int] = None,
     ) -> PaginatedResponse[SignalResponse]:
-        """Get paginated list of signals with optional filters."""
+        """
+        Get paginated list of signals with optional filters.
+
+        Args:
+            session: Database session
+            pagination: Pagination parameters
+            ticker: Filter by ticker symbol (e.g., 'TATASTEEL')
+            action: Filter by action type (BUY, SELL, HOLD)
+            min_confidence: Filter by minimum confidence score (0-100)
+            days_old: Filter by signals created within the last N days
+        """
         response = await self.signal_repository.get_paginated_signals(
             session=session,
             pagination=pagination,
             ticker=ticker,
             action=action,
+            min_confidence=min_confidence,
+            days_old=days_old,
         )
 
         response.items = [
@@ -52,6 +66,8 @@ class SignalService:
             size=pagination.size,
             ticker=ticker,
             action=action,
+            min_confidence=min_confidence,
+            days_old=days_old,
         )
 
         return response
