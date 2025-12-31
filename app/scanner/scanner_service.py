@@ -153,6 +153,11 @@ class ScannerService:
     ) -> ScanResult:
         """Scan a single ticker and save signal if confidence is high enough."""
         try:
+
+            if await self.signal_repository.has_active_signal(ticker, session):
+                logger.info("signal_scan_skipped_exists", ticker=ticker)
+                return ScanResult(ticker=ticker, success=True, action="SKIPPED", error="Active signal already exists")
+
             logger.info("scanning_ticker", ticker=ticker)
 
             # 1. Fetch Data

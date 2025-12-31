@@ -6,10 +6,12 @@ Extends base repository with signal-specific queries and operations.
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, List, Optional
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import handle_exceptions
 from app.models import Signal
+from app.models.enums import SignalStatus
 from app.repositories.base_repository import BaseRepository
 from app.schemas import PaginationParams
 
@@ -17,6 +19,17 @@ from app.schemas import PaginationParams
 class SignalRepository(BaseRepository[Signal]):
     def __init__(self):
         super().__init__(Signal)
+
+    @handle_exceptions(operation_type="database")
+    async def has_active_signal(self, ticker: str, session: AsyncSession) -> bool:
+        """
+        Check if there is already an ACTIVE or PENDING signal for this ticker.
+        """
+        query = select(Signal).where(
+            Signal.ticker == ticker.upper(), Signal.status.in_([SignalStatus.ACTIVE, SignalStatus.PENDING])
+        )
+        result = await session.execute(query)
+        return result.first() is not None
 
     @handle_exceptions(operation_type="database")
     async def get_by_ticker(
