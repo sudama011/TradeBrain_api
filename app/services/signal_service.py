@@ -1,10 +1,3 @@
-"""
-Signal service for handling signal-related business logic.
-
-This service provides a unified interface for signal management operations
-using the repository pattern.
-"""
-
 from typing import List, Optional
 from uuid import UUID
 
@@ -13,16 +6,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import NotFoundError, handle_exceptions
 from app.core.logging import get_logger
 from app.models import Signal
-from app.repositories.signal_repository import SignalRepository
-from app.schemas import PaginatedResponse, PaginationParams
-from app.schemas.signal_schemas import SignalCreate, SignalResponse, SignalUpdate
+from app.repositories.signal_repository import signal_repository
+from app.schemas import PaginatedResponse, PaginationParams, SignalCreate, SignalResponse, SignalUpdate
 
 logger = get_logger(__name__)
 
 
 class SignalService:
-    def __init__(self):
-        self.signal_repository = SignalRepository()
+    def __init__(self, signal_repository=signal_repository):
+        self.signal_repository = signal_repository
 
     @handle_exceptions(operation_type="signal_service")
     async def get_signals(
@@ -54,10 +46,7 @@ class SignalService:
             days_old=days_old,
         )
 
-        response.items = [
-            SignalResponse.model_validate(signal, from_attributes=True)
-            for signal in response.items
-        ]
+        response.items = [SignalResponse.model_validate(signal, from_attributes=True) for signal in response.items]
 
         logger.info(
             "fetched_signals",
@@ -80,10 +69,7 @@ class SignalService:
     ) -> List[SignalResponse]:
         """Get the latest signals."""
         signals = await self.signal_repository.get_latest_signals(session, limit)
-        return [
-            SignalResponse.model_validate(signal, from_attributes=True)
-            for signal in signals
-        ]
+        return [SignalResponse.model_validate(signal, from_attributes=True) for signal in signals]
 
     @handle_exceptions(operation_type="signal_service")
     async def get_signal_by_id(
@@ -106,10 +92,7 @@ class SignalService:
     ) -> List[SignalResponse]:
         """Get signals for a specific ticker."""
         signals = await self.signal_repository.get_by_ticker(ticker, session, limit)
-        return [
-            SignalResponse.model_validate(signal, from_attributes=True)
-            for signal in signals
-        ]
+        return [SignalResponse.model_validate(signal, from_attributes=True) for signal in signals]
 
     @handle_exceptions(operation_type="signal_service")
     async def get_high_confidence_signals(
@@ -119,13 +102,8 @@ class SignalService:
         limit: int = 50,
     ) -> List[SignalResponse]:
         """Get signals with high confidence scores."""
-        signals = await self.signal_repository.get_high_confidence_signals(
-            session, min_confidence, limit
-        )
-        return [
-            SignalResponse.model_validate(signal, from_attributes=True)
-            for signal in signals
-        ]
+        signals = await self.signal_repository.get_high_confidence_signals(session, min_confidence, limit)
+        return [SignalResponse.model_validate(signal, from_attributes=True) for signal in signals]
 
     @handle_exceptions(operation_type="signal_service")
     async def create_signal(
@@ -183,6 +161,4 @@ class SignalService:
         return True
 
 
-# Singleton instance
 signal_service = SignalService()
-

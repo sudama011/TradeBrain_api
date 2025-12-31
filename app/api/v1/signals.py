@@ -20,15 +20,9 @@ async def get_signals(
     page: int = Query(1, ge=1, description="Page number"),
     size: int = Query(20, ge=1, le=100, description="Items per page"),
     ticker: Optional[str] = Query(None, description="Filter by ticker symbol (e.g., TATASTEEL)"),
-    action: Optional[str] = Query(
-        None, pattern="^(BUY|SELL|HOLD)$", description="Filter by action type"
-    ),
-    min_confidence: Optional[int] = Query(
-        None, ge=0, le=100, description="Filter by minimum confidence score"
-    ),
-    days_old: Optional[int] = Query(
-        None, ge=1, le=365, description="Filter signals created within the last N days"
-    ),
+    action: Optional[str] = Query(None, pattern="^(BUY|SELL|HOLD)$", description="Filter by action type"),
+    min_confidence: Optional[int] = Query(None, ge=0, le=100, description="Filter by minimum confidence score"),
+    days_old: Optional[int] = Query(None, ge=1, le=365, description="Filter signals created within the last N days"),
     session: AsyncSession = Depends(get_session),
 ):
     """

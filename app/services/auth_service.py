@@ -12,7 +12,7 @@ from app.core.security import (
     decode_token,
     verify_password,
 )
-from app.repositories.user_repository import UserRepository
+from app.repositories import user_repository
 from app.schemas import LoginResponse, RefreshTokenResponse
 from app.utils import normalize_email
 
@@ -20,9 +20,8 @@ logger = get_logger(__name__)
 
 
 class UserAuthenticationService:
-    def __init__(self):
-        super().__init__()
-        self.user_repository = UserRepository()
+    def __init__(self, user_repository=user_repository):
+        self.user_repository = user_repository
 
     @handle_exceptions(operation_type="auth")
     async def authenticate_user(self, email: str, password: str, session: AsyncSession) -> Dict[str, Any]:
@@ -55,7 +54,11 @@ class UserAuthenticationService:
         if not user or not user.is_active:
             raise AuthenticationError("User not found or inactive")
         new_access_token = create_access_token(user.email)
-        return RefreshTokenResponse(access_token=new_access_token)
+
+        return RefreshTokenResponse(
+            access_token=new_access_token,
+            access_token_expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        )
 
     @handle_exceptions(operation_type="auth")
     async def logout(self, token: str) -> dict:
@@ -73,5 +76,4 @@ class UserAuthenticationService:
         return {"message": "Successfully logged out", "success": True}
 
 
-# Singleton instance
 auth_service = UserAuthenticationService()

@@ -1,18 +1,11 @@
-"""
-User service for handling user-related business logic.
-
-This service provides a unified interface for user management operations
-using the repository pattern and authentication service.
-"""
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import BusinessLogicError, NotFoundError, handle_exceptions
 from app.core.logging import get_logger
 from app.core.security import get_password_hash
 from app.models import User
+from app.repositories import user_repository
 from app.repositories.base_repository import RelationshipLoading
-from app.repositories.user_repository import UserRepository
 from app.schemas import PaginatedResponse, PaginationParams, UserCreate, UserResponse
 from app.utils import normalize_email
 
@@ -20,9 +13,9 @@ logger = get_logger(__name__)
 
 
 class UserService:
-    def __init__(self):
-        super().__init__()
-        self.user_repository = UserRepository()
+
+    def __init__(self, user_repository=user_repository):
+        self.user_repository = user_repository
 
     @handle_exceptions(operation_type="user_service")
     async def get_user_by_email(self, email: str, session: AsyncSession) -> UserResponse:
@@ -65,5 +58,4 @@ class UserService:
         return response
 
 
-# Singleton instance
 user_service = UserService()

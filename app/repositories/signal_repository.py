@@ -28,12 +28,7 @@ class SignalRepository(BaseRepository[Signal]):
     ) -> List[Signal]:
         """Get signals for a specific ticker."""
         query_builder = AsyncQueryBuilder(self.model_class, session)
-        query = (
-            query_builder._build()
-            .where(Signal.ticker == ticker)
-            .order_by(Signal.created_at.desc())
-            .limit(limit)
-        )
+        query = query_builder._build().where(Signal.ticker == ticker).order_by(Signal.created_at.desc()).limit(limit)
         result = await session.execute(query)
         return list(result.scalars().all())
 
@@ -58,12 +53,7 @@ class SignalRepository(BaseRepository[Signal]):
     ) -> List[Signal]:
         """Get signals filtered by action type (BUY, SELL, HOLD)."""
         query_builder = AsyncQueryBuilder(self.model_class, session)
-        query = (
-            query_builder._build()
-            .where(Signal.action == action)
-            .order_by(Signal.created_at.desc())
-            .limit(limit)
-        )
+        query = query_builder._build().where(Signal.action == action).order_by(Signal.created_at.desc()).limit(limit)
         result = await session.execute(query)
         return list(result.scalars().all())
 
@@ -138,4 +128,3 @@ class SignalRepository(BaseRepository[Signal]):
 
 # Singleton instance
 signal_repository = SignalRepository()
-
