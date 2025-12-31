@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import handle_exceptions
-from app.db.query_builder import AsyncQueryBuilder
 from app.models import Signal
 from app.repositories.base_repository import BaseRepository
 from app.schemas import PaginationParams
@@ -26,11 +25,12 @@ class SignalRepository(BaseRepository[Signal]):
         session: AsyncSession,
         limit: int = 50,
     ) -> List[Signal]:
-        """Get signals for a specific ticker."""
-        query_builder = AsyncQueryBuilder(self.model_class, session)
-        query = query_builder._build().where(Signal.ticker == ticker).order_by(Signal.created_at.desc()).limit(limit)
-        result = await session.execute(query)
-        return list(result.scalars().all())
+        """Get signals for a specific ticker, ordered by creation date."""
+        return await self._get_filtered_signals(
+            session=session,
+            filters={"ticker": ticker.upper()},
+            limit=limit,
+        )
 
     @handle_exceptions(operation_type="database")
     async def get_latest_signals(
@@ -39,10 +39,7 @@ class SignalRepository(BaseRepository[Signal]):
         limit: int = 50,
     ) -> List[Signal]:
         """Get the latest signals ordered by creation date."""
-        query_builder = AsyncQueryBuilder(self.model_class, session)
-        query = query_builder._build().order_by(Signal.created_at.desc()).limit(limit)
-        result = await session.execute(query)
-        return list(result.scalars().all())
+        return await self._get_filtered_signals(session=session, limit=limit)
 
     @handle_exceptions(operation_type="database")
     async def get_signals_by_action(
@@ -52,10 +49,11 @@ class SignalRepository(BaseRepository[Signal]):
         limit: int = 50,
     ) -> List[Signal]:
         """Get signals filtered by action type (BUY, SELL, HOLD)."""
-        query_builder = AsyncQueryBuilder(self.model_class, session)
-        query = query_builder._build().where(Signal.action == action).order_by(Signal.created_at.desc()).limit(limit)
-        result = await session.execute(query)
-        return list(result.scalars().all())
+        return await self._get_filtered_signals(
+            session=session,
+            filters={"action": action.upper()},
+            limit=limit,
+        )
 
     @handle_exceptions(operation_type="database")
     async def get_high_confidence_signals(
@@ -65,15 +63,11 @@ class SignalRepository(BaseRepository[Signal]):
         limit: int = 50,
     ) -> List[Signal]:
         """Get signals with confidence score above threshold."""
-        query_builder = AsyncQueryBuilder(self.model_class, session)
-        query = (
-            query_builder._build()
-            .where(Signal.confidence >= min_confidence)
-            .order_by(Signal.created_at.desc())
-            .limit(limit)
+        return await self._get_filtered_signals(
+            session=session,
+            advanced_filters=[Signal.confidence >= min_confidence],
+            limit=limit,
         )
-        result = await session.execute(query)
-        return list(result.scalars().all())
 
     @handle_exceptions(operation_type="database")
     async def get_paginated_signals(
@@ -96,7 +90,7 @@ class SignalRepository(BaseRepository[Signal]):
             min_confidence: Filter by minimum confidence score
             days_old: Filter by signals created within the last N days
         """
-        query_builder = AsyncQueryBuilder(self.model_class, session)
+        query_builder = self._get_query_builder(session)
 
         # Apply simple equality filters
         filters = {}
@@ -124,6 +118,37 @@ class SignalRepository(BaseRepository[Signal]):
         query_builder = query_builder.order_by_fields([("created_at", "desc")])
 
         return await query_builder.paginate(pagination)
+
+    async def _get_filtered_signals(
+        self,
+        session: AsyncSession,
+        filters: Optional[Dict[str, Any]] = None,
+        advanced_filters: Optional[List[Any]] = None,
+        limit: int = 50,
+    ) -> List[Signal]:
+        """
+        Internal helper to get filtered signals with common ordering.
+
+        Args:
+            session: Database session
+            filters: Simple equality filters (field: value)
+            advanced_filters: Complex filter expressions (e.g., >= comparisons)
+            limit: Maximum number of results
+        """
+        query_builder = self._get_query_builder(session)
+
+        if filters:
+            query_builder = query_builder.filter_by_fields(filters)
+
+        if advanced_filters:
+            query_builder = query_builder.advanced_filter(*advanced_filters)
+
+        query_builder = query_builder.order_by_fields([("created_at", "desc")])
+
+        # Build and apply limit
+        query = query_builder._build().limit(limit)
+        result = await session.execute(query)
+        return list(result.scalars().all())
 
 
 # Singleton instance

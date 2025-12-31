@@ -19,7 +19,7 @@ logger = get_logger(__name__)
 class ScannerScheduler:
     """
     Manages scheduled scanner jobs using APScheduler.
-    
+
     The scheduler runs scans automatically based on a cron expression.
     Default schedule: 9 AM and 3 PM on weekdays (market hours).
     """
@@ -36,7 +36,7 @@ class ScannerScheduler:
     def start(self) -> bool:
         """
         Start the scheduler if scanner is enabled.
-        
+
         Returns:
             True if scheduler started, False if disabled or already running.
         """
@@ -49,7 +49,7 @@ class ScannerScheduler:
             return False
 
         self._scheduler = AsyncIOScheduler()
-        
+
         # Parse cron expression (format: minute hour day month day_of_week)
         cron_parts = settings.SCANNER_CRON_EXPRESSION.split()
         if len(cron_parts) == 5:
@@ -75,7 +75,7 @@ class ScannerScheduler:
 
         self._scheduler.start()
         self._is_running = True
-        
+
         logger.info(
             "scanner_scheduler_started",
             cron=settings.SCANNER_CRON_EXPRESSION,
@@ -93,17 +93,15 @@ class ScannerScheduler:
     async def _run_scheduled_scan(self) -> None:
         """Execute a scheduled scan."""
         from app.scanner.scanner_service import scanner_service
-        
+
         logger.info("scheduled_scan_starting")
-        
+
         try:
-            results = await scanner_service.run_scan(
-                min_confidence=settings.SCANNER_MIN_CONFIDENCE
-            )
-            
+            results = await scanner_service.run_scan(min_confidence=settings.SCANNER_MIN_CONFIDENCE)
+
             signals_found = sum(1 for r in results if r.success and r.action)
             errors = sum(1 for r in results if not r.success)
-            
+
             logger.info(
                 "scheduled_scan_completed",
                 tickers_scanned=len(results),
@@ -117,7 +115,7 @@ class ScannerScheduler:
         """Get the next scheduled run time."""
         if not self._scheduler or not self._is_running:
             return None
-        
+
         job = self._scheduler.get_job("market_scanner")
         if job and job.next_run_time:
             return job.next_run_time.isoformat()
@@ -136,4 +134,3 @@ class ScannerScheduler:
 
 # Singleton instance
 scanner_scheduler = ScannerScheduler()
-

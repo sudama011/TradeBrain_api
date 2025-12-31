@@ -33,6 +33,7 @@ class WatchlistRepository(BaseRepository[WatchlistItem]):
         session: AsyncSession,
     ) -> List[str]:
         """Get all active ticker symbols, ordered by priority."""
+        # Using raw query for column projection (ticker only)
         query = (
             select(WatchlistItem.ticker)
             .where(WatchlistItem.is_active == True)  # noqa: E712
@@ -48,13 +49,12 @@ class WatchlistRepository(BaseRepository[WatchlistItem]):
         include_inactive: bool = False,
     ) -> List[WatchlistItem]:
         """Get all watchlist items, optionally including inactive ones."""
-        query = select(WatchlistItem).order_by(WatchlistItem.priority.asc())
+        builder = self._get_query_builder(session)
 
         if not include_inactive:
-            query = query.where(WatchlistItem.is_active == True)  # noqa: E712
+            builder = builder.filter_by_fields({"is_active": True})
 
-        result = await session.execute(query)
-        return list(result.scalars().all())
+        return await builder.order_by_fields([("priority", "asc")]).all()
 
     @handle_exceptions(operation_type="database")
     async def add_ticker(
