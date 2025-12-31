@@ -16,6 +16,7 @@ from app.core.middleware import (
 )
 from app.core.security_constants import API_SECURITY_CONFIG
 from app.db.database import close_db_connections, init_database
+from app.scanner.scheduler import scanner_scheduler
 
 # Initialize structured logging
 configure_logging()
@@ -27,11 +28,17 @@ async def lifespan(_: FastAPI):
     logger.info(f"Starting up {settings.APP_NAME} API...")
 
     await init_database(seed_data=settings.ENVIRONMENT == "dev")
+
+    # Start the scanner scheduler for automated scans
+    if scanner_scheduler.start():
+        logger.info("scanner_scheduler_initialized", status=scanner_scheduler.get_status())
+
     logger.info("Application startup completed")
 
     yield
 
     logger.info(f"Shutting down {settings.APP_NAME} API...")
+    scanner_scheduler.stop()
     await close_db_connections()
     logger.info("Application shutdown completed")
 

@@ -9,6 +9,7 @@ class RefreshTokenRequest(BaseModel):
 
 class RefreshTokenResponse(BaseModel):
     access_token: str
+    access_token_expires_in: int
 
 
 class LoginRequest(BaseModel):

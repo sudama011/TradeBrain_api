@@ -10,3 +10,11 @@ from app.schemas.common_schemas import (
 )
 from app.schemas.signal_schemas import SignalCreate, SignalResponse, SignalUpdate
 from app.schemas.user_schemas import UserCreate, UserResponse
+from app.schemas.watchlist_schemas import (
+    WatchlistBulkUpdate,
+    WatchlistItemCreate,
+    WatchlistItemResponse,
+    WatchlistItemUpdate,
+    WatchlistResponse,
+    WatchlistTickersResponse,
+)

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
@@ -7,10 +7,13 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.logging import get_logger
 from app.core.security import get_password_hash
-from app.models import User
+from app.models import User, WatchlistItem
 from app.utils import normalize_email
 
 logger = get_logger(__name__)
+
+# Default watchlist for seeding
+DEFAULT_WATCHLIST = ["TATASTEEL", "RELIANCE", "INFY"]
 
 try:
     with open("app/db/mock_data.json", "r") as f:
@@ -36,9 +39,12 @@ async def seed_database(seed: bool = True) -> None:
 
     try:
         with Session(sync_engine) as session:
-
+            # Seed users
             for user_data in mock_data:
                 _create_user(session, user_data)
+
+            # Seed watchlist
+            _seed_watchlist(session, DEFAULT_WATCHLIST)
 
             session.commit()
             logger.info("Database seeding successful.")
@@ -65,3 +71,22 @@ def _create_user(
 
     logger.info("User created successfully.", email=email)
     return user
+
+
+def _seed_watchlist(session: Session, tickers: List[str]) -> None:
+    """Seed default watchlist items if they don't exist."""
+    for i, ticker in enumerate(tickers):
+        ticker = ticker.upper()
+        existing = session.execute(select(WatchlistItem).where(WatchlistItem.ticker == ticker)).scalar()
+
+        if existing:
+            logger.info("Watchlist item already exists, skipping.", ticker=ticker)
+            continue
+
+        item = WatchlistItem(
+            ticker=ticker,
+            is_active=True,
+            priority=(i + 1) * 10,  # 10, 20, 30...
+        )
+        session.add(item)
+        logger.info("Watchlist item created.", ticker=ticker)

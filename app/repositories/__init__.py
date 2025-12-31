@@ -1,2 +1,3 @@
 from app.repositories.signal_repository import signal_repository
 from app.repositories.user_repository import user_repository
+from app.repositories.watchlist_repository import watchlist_repository

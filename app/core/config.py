@@ -35,6 +35,11 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES", 24 * 60))
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
 
+    # Scanner scheduling settings
+    SCANNER_ENABLED: bool = os.getenv("SCANNER_ENABLED", "true").lower() == "true"
+    SCANNER_CRON_EXPRESSION: str = os.getenv("SCANNER_CRON_EXPRESSION", "0 9,15 * * 1-5")  # 9 AM & 3 PM on weekdays
+    SCANNER_MIN_CONFIDENCE: int = int(os.getenv("SCANNER_MIN_CONFIDENCE", 75))
+
 
 # Global settings instance
 settings = Settings()
