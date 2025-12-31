@@ -26,7 +26,7 @@ logger = get_logger(__name__)
 async def lifespan(_: FastAPI):
     logger.info(f"Starting up {settings.APP_NAME} API...")
 
-    await init_database(seed_data=settings.ENVIRONMENT != "production")
+    await init_database(seed_data=settings.ENVIRONMENT == "dev")
     logger.info("Application startup completed")
 
     yield

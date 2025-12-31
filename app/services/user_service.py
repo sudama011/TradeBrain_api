@@ -47,7 +47,7 @@ class UserService:
             hashed_password=hashed_password,
         )
         created_user = await self.user_repository.create(user, session)
-        return UserResponse(**created_user.model_dump())
+        return UserResponse(created_user, from_attributes=True)
 
     async def list_users(
         self,

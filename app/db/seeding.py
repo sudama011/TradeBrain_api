@@ -28,7 +28,7 @@ async def seed_database(seed: bool = True) -> None:
 
     # Create a synchronous engine for the seeding script
     try:
-        sync_db_url = settings.DATABASE_URL.replace("+asyncpg", "")
+        sync_db_url = settings.DATABASE_URL.replace("+asyncpg", "").replace("+aiosqlite", "")
         sync_engine = create_engine(sync_db_url, echo=settings.DATABASE_ECHO)
     except Exception as e:
         logger.error(f"Failed to create synchronous engine: {e}")

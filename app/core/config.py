@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
 
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-super-secret-key")
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 15))
     REFRESH_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_MINUTES", 24 * 60))
     ALGORITHM: str = os.getenv("ALGORITHM", "HS256")

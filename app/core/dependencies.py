@@ -66,7 +66,7 @@ async def get_current_user(
 
 
 def require_admin(current_user: Annotated[User, Depends(get_current_user)]) -> Optional[User]:
-    if not hasattr(current_user, "role") or current_user.role != UserRole.ADMIN.value:
+    if current_user.role != UserRole.ADMIN:
         logger.warning(
             "Admin access denied",
             user_id=str(getattr(current_user, "id", "unknown")),

@@ -1,8 +1,5 @@
 import asyncio
-import time
 from datetime import datetime, timezone
-
-import schedule
 
 from app.db.database import AsyncSessionLocal
 from app.models.signal_models import Signal
@@ -10,7 +7,7 @@ from scanner.agents import analyze_opportunity
 from scanner.tools import get_market_data, get_news_context
 
 # The "Watchlist"
-WATCHLIST = ["TATASTEEL", "RELIANCE", "INFY", "ZOMATO"]
+WATCHLIST = ["TATASTEEL", "RELIANCE", "INFY"]
 
 
 async def save_signal(ticker, ai_result, url):
@@ -60,7 +57,7 @@ async def job():
             if decision and decision.get("confidence_score", 0) >= 75:
                 await save_signal(ticker, decision, top_url)
             else:
-                print(f"   Skipping: Low confidence ({decision.get('confidence_score', 0)}%)")
+                print(f"   Skipping: Low confidence ({decision and decision.get('confidence_score', 0)}%)")
 
         except Exception as e:
             print(f"   Error processing {ticker}: {e}")

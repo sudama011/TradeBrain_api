@@ -6,7 +6,7 @@ from app.core.dependencies import get_session
 from app.core.exceptions import DatabaseError
 from app.core.logging import get_logger
 from app.models import Signal
-from app.schemas import PaginatedResponse, SignalResponse
+from app.schemas import PaginatedResponse, SignalResponse, get_paginated_response
 
 router = APIRouter()
 logger = get_logger(__name__)
@@ -29,7 +29,7 @@ async def get_signals(limit: int = 50, session: AsyncSession = Depends(get_sessi
 
         logger.info("fetched_signals_async", count=len(signals), limit=limit)
 
-        return PaginatedResponse[SignalResponse](
+        return get_paginated_response(
             items=[SignalResponse.model_validate(signal, from_attributes=True) for signal in signals],
             total=len(signals),
             page=1,
