@@ -8,7 +8,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import handle_exceptions
-from app.models.watchlist_models import WatchlistItem
+from app.models import WatchlistItem
 from app.repositories.base_repository import BaseRepository
 
 

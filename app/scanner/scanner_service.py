@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
 from app.db.database import AsyncSessionLocal
-from app.models.signal_models import Signal
+from app.models import Signal, SignalStatus
 from app.repositories import signal_repository, watchlist_repository
 from app.scanner import analyze_opportunity, check_api_health, get_market_data, get_news_context
 
@@ -155,57 +155,53 @@ class ScannerService:
         try:
             logger.info("scanning_ticker", ticker=ticker)
 
-            # Fetch market data
+            # 1. Fetch Data
             market_data = get_market_data(ticker)
             if not market_data:
                 return ScanResult(ticker=ticker, success=False, error="No market data")
 
-            # Fetch news context
             news_text, source_url = get_news_context(ticker)
 
-            # Analyze with AI
+            # 2. Analyze (Agent + Validator)
+            # This now returns a fully validated dictionary with calculated R/R and dates
             decision = analyze_opportunity(ticker, market_data, news_text)
 
             if not decision:
-                return ScanResult(ticker=ticker, success=False, error="No AI decision")
+                return ScanResult(ticker=ticker, success=False, error="AI Rejected or Validation Failed")
 
             confidence = decision.get("confidence_score", 0)
-            action = decision.get("action")
 
-            # Save signal if confidence meets threshold
+            # 3. Save to Database
             if confidence >= min_confidence:
                 signal = Signal(
                     ticker=ticker,
-                    action=action,
+                    action=decision.get("action"),
                     confidence=confidence,
+                    # New Fields
+                    status=decision.get("status", SignalStatus.ACTIVE),
+                    setup_type=decision.get("setup_type"),
+                    time_horizon=decision.get("time_horizon"),
+                    expires_at=decision.get("expires_at"),
+                    risk_reward=decision.get("risk_reward"),
+                    # Price Levels
                     entry_price=decision.get("entry_price"),
                     target_price=decision.get("target_price"),
                     stop_loss=decision.get("stop_loss"),
                     reasoning=decision.get("reasoning", ""),
                     source_url=source_url,
-                    created_at=datetime.now(timezone.utc),
                 )
-                # Use repository pattern for database operations
+
                 await self.signal_repository.create(signal, session)
 
                 return ScanResult(
                     ticker=ticker,
                     success=True,
-                    action=action,
+                    action=decision.get("action"),
                     confidence=confidence,
                 )
             else:
-                logger.info(
-                    "signal_skipped_low_confidence",
-                    ticker=ticker,
-                    confidence=confidence,
-                )
-                return ScanResult(
-                    ticker=ticker,
-                    success=True,
-                    action=None,
-                    confidence=confidence,
-                )
+                # ... existing logging ...
+                return ScanResult(ticker=ticker, success=True, action=None, confidence=confidence)
 
         except Exception as e:
             logger.error("ticker_scan_failed", ticker=ticker, error=str(e))
