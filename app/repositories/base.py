@@ -11,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.errors import handle_exceptions
 from app.core.logger import get_logger
 from app.db.query_builder import AsyncQueryBuilder
+from app.schemas import PaginatedResponse, PaginationParams
 
 T = TypeVar("T")
 RelationshipStrategy = Literal["selectin", "joined", "subquery", "noload"]
@@ -43,11 +44,11 @@ class IRepository(ABC, Generic[T]):
     async def get_paginated(
         self,
         session: AsyncSession,
-        pagination: Dict[str, Any],
+        pagination: PaginationParams,
         filters: Optional[Dict[str, Any]] = None,
         order_by: Optional[List[tuple]] = None,
         relationships: Optional[RelationshipLoading] = None,
-    ) -> Dict[str, Any]:
+    ) -> PaginatedResponse[T]:
         pass
 
     @abstractmethod
@@ -127,11 +128,11 @@ class BaseRepository(IRepository[T], Generic[T]):
     async def get_paginated(
         self,
         session: AsyncSession,
-        pagination: Dict[str, Any],
+        pagination: PaginationParams,
         filters: Optional[Dict[str, Any]] = None,
         order_by: Optional[List[tuple]] = None,
         relationships: Optional[RelationshipLoading] = None,
-    ) -> Dict[str, Any]:
+    ) -> PaginatedResponse[T]:
         builder = self._get_query_builder(session)
 
         if filters:

@@ -26,16 +26,24 @@ def get_market_data(ticker: str) -> Optional[Dict]:
     Fetches the last 5 days of price data.
     """
     try:
-        # Append .NS for NSE stocks if not present
-        symbol = ticker if ticker.endswith(".NS") else f"{ticker}.NS"
+        symbol = ticker.upper() if ticker.endswith(".NS") else f"{ticker}.NS"
         stock = yf.Ticker(symbol)
-
-        # Get 5 days history
         hist = stock.history(period="5d")
 
         if hist.empty:
-            logger.warning("empty_market_data", ticker=ticker)
-            return None
+            try:
+                info = stock.fast_info
+                return {
+                    "current_price": round(info.last_price, 2),
+                    "day_high": round(info.day_high, 2),
+                    "day_low": round(info.day_low, 2),
+                    "change_pct": 0.0,
+                    "trend": "NEUTRAL",
+                    "volume_avg": int(info.last_volume),
+                }
+            except:
+                logger.warning("empty_market_data_and_fallback_failed", ticker=ticker)
+                return None
 
         latest = hist.iloc[-1]
         prev_close = hist["Close"].iloc[-2] if len(hist) > 1 else latest["Open"]

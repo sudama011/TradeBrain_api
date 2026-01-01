@@ -6,6 +6,7 @@ and extracts ticker symbols to feed into the main scanner.
 """
 
 import json
+import re
 from typing import List
 
 import google.genai as genai
@@ -76,8 +77,12 @@ def get_trending_tickers() -> List[str]:
 
     try:
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        text = response.text.replace("```json", "").replace("```", "").strip()
-        tickers = json.loads(text)
+        text = response.text.strip()
+        json_match = re.search(r"\[.*\]", text, re.DOTALL)
+        if not json_match:
+            return []
+
+        tickers: List[str] = json.loads(json_match.group())
 
         # 3. Clean and Validate
         cleaned_tickers = []

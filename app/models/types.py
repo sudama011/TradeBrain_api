@@ -11,9 +11,8 @@ class SignalStatus(str, enum.Enum):
     ACTIVE = "ACTIVE"  # Entry triggered, trade is live
     HIT_TARGET = "HIT_TARGET"  # Profit booked
     HIT_STOP_LOSS = "HIT_STOP_LOSS"  # Stop loss hit
-    TIMED_OUT = "TIMED_OUT"  # Time horizon expired before entry
+    EXPIRED = "EXPIRED"  # Time horizon expired before entry
     MANUAL_CLOSE = "MANUAL_CLOSE"  # Admin manually closed the trade
-    VOID = "VOID"  # System invalidated the trade
 
 
 class UserTradeStatus(str, enum.Enum):
@@ -27,6 +26,7 @@ class SetupType(str, enum.Enum):
     REVERSAL = "REVERSAL"
     MOMENTUM = "MOMENTUM"
     VALUE = "VALUE"
+    NEUTRAL = "NEUTRAL"
 
 
 class SignalAction(str, enum.Enum):

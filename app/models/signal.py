@@ -1,6 +1,18 @@
 import uuid
 
-from sqlalchemy import Column, DateTime, Enum, Float, ForeignKey, Integer, String, Text, UniqueConstraint, Uuid
+from sqlalchemy import (
+    CheckConstraint,
+    Column,
+    DateTime,
+    Enum,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import BaseModel
@@ -9,7 +21,7 @@ from app.models.types import SetupType, SignalAction, SignalStatus
 
 class Signal(BaseModel):
     __tablename__ = "signals"
-
+    __table_args__ = (CheckConstraint("ticker = UPPER(ticker)", name="ticker_is_uppercase"),)
     ticker = Column(String(20), index=True, nullable=False)
     action = Column(Enum(SignalAction), default=SignalAction.BUY, nullable=False)
     confidence = Column(Integer, nullable=False)

@@ -83,14 +83,19 @@ def analyze_opportunity(ticker: str, market_data: Dict[str, Any], news_context: 
     try:
         # Using the latest flash model for speed and reasoning
         response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
-        text = response.text.replace("```json", "").replace("```", "").strip()
+        text = response.text.strip()
 
-        # 1. Handle Rejection (AI decided it's a bad trade)
-        if not text or text == "null":
-            logger.info("ai_rejected_trade", ticker=ticker, reason="Triple Confirmation Failed")
+        json_match = re.search(r"\{.*\}", text, re.DOTALL)
+        if not json_match:
+            logger.warning("no_json_found_in_ai_response", ticker=ticker, raw_text=text)
             return None
 
-        result = json.loads(text)
+        result = json.loads(json_match.group())
+
+        # 1. Handle Rejection (AI decided it's a bad trade)
+        if not result or result == {}:
+            logger.info("ai_rejected_trade", ticker=ticker, reason="Triple Confirmation Failed")
+            return None
 
         # 2. VALIDATION LAYER (The Math Police)
         validation = signal_validator.validate(result)

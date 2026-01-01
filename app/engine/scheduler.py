@@ -110,7 +110,7 @@ class ScannerScheduler:
 
     async def _run_scheduled_scan(self) -> None:
         """Execute a scheduled scan."""
-        from app.engine.orchestrator import scanner_service
+        from app.services.scanner import scanner_service
 
         logger.info("scheduled_scan_starting")
 

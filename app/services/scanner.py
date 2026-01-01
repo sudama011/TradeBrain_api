@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logger import get_logger
 from app.db.database import AsyncSessionLocal
 from app.engine import analyze_opportunity, check_api_health, get_market_data, get_news_context
-from app.models import Signal, SignalStatus
+from app.models import SetupType, Signal, SignalAction, SignalStatus
 from app.repositories import signal_repository, watchlist_repository
 
 logger = get_logger(__name__)
@@ -180,11 +180,11 @@ class ScannerService:
             if confidence >= min_confidence:
                 signal = Signal(
                     ticker=ticker,
-                    action=decision.get("action"),
+                    action=SignalAction(decision.get("action").upper()),
                     confidence=confidence,
                     # New Fields
-                    status=decision.get("status", SignalStatus.ACTIVE),
-                    setup_type=decision.get("setup_type"),
+                    status=SignalStatus(decision.get("status").upper()),
+                    setup_type=SetupType(decision.get("setup_type").upper()),
                     time_horizon=decision.get("time_horizon"),
                     expires_at=decision.get("expires_at"),
                     risk_reward=decision.get("risk_reward"),

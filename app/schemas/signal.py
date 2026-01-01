@@ -5,9 +5,10 @@ Pydantic schemas for API request/response validation.
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
-from app.models.types import SignalAction, SignalStatus, SetupType
 
 from pydantic import BaseModel, Field
+
+from app.models.types import SetupType, SignalAction, SignalStatus
 
 
 class SignalBase(BaseModel):
@@ -42,6 +43,7 @@ class SignalUpdate(BaseModel):
     source_url: Optional[str] = None
     status: SignalStatus = Field(default=SignalStatus.ACTIVE)
     setup_type: SetupType = Field(default=None)
+
 
 class SignalResponse(SignalBase):
     """Schema for signal response."""
