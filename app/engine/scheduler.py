@@ -10,10 +10,10 @@ from typing import Optional
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from app.core.config import settings
-from app.core.logging import get_logger
+from app.core.logger import get_logger
+from app.core.settings import settings
 from app.db.database import AsyncSessionLocal
-from app.scanner.signal_auditor import signal_auditor
+from app.engine.auditor import signal_auditor
 
 logger = get_logger(__name__)
 
@@ -110,7 +110,7 @@ class ScannerScheduler:
 
     async def _run_scheduled_scan(self) -> None:
         """Execute a scheduled scan."""
-        from app.scanner.scanner_service import scanner_service
+        from app.engine.orchestrator import scanner_service
 
         logger.info("scheduled_scan_starting")
 

@@ -7,9 +7,9 @@ from typing import List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import handle_exceptions
+from app.core.errors import handle_exceptions
 from app.models import WatchlistItem
-from app.repositories.base_repository import BaseRepository
+from app.repositories.base import BaseRepository
 
 
 class WatchlistRepository(BaseRepository[WatchlistItem]):

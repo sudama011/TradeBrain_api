@@ -9,10 +9,10 @@ from typing import List, Optional
 from fastapi import APIRouter, BackgroundTasks, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.dependencies import get_session, require_admin
-from app.core.logging import get_logger
+from app.core.deps import get_session, require_admin
+from app.core.logger import get_logger
+from app.engine.scheduler import scanner_scheduler
 from app.models import User
-from app.scanner.scheduler import scanner_scheduler
 from app.schemas import WatchlistItemCreate, WatchlistItemResponse, WatchlistItemUpdate
 from app.services import scanner_service, watchlist_service
 

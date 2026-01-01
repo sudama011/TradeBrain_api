@@ -1,5 +1,8 @@
-from app.models.base_model import SystemLog
-from app.models.enums import (
+from app.models.base import SystemLog
+from app.models.notification import Notification
+from app.models.signal import Signal, UserSignalFavorite
+from app.models.trade import UserTrade
+from app.models.types import (
     NotificationType,
     PlatformType,
     SetupType,
@@ -8,5 +11,5 @@ from app.models.enums import (
     UserRole,
     UserTradeStatus,
 )
-from app.models.signal_models import Signal, UserSignalFavorite, UserTrade, WatchlistItem
-from app.models.user_models import Notification, User, UserDevice, UserSession
+from app.models.user import User, UserDevice, UserSession
+from app.models.watchlist import WatchlistItem

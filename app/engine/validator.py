@@ -8,8 +8,8 @@ adhere to strict financial logic and risk management rules.
 from dataclasses import dataclass
 from typing import Any, Dict, Optional
 
-from app.core.logging import get_logger
-from app.models.enums import SignalAction
+from app.core.logger import get_logger
+from app.models.types import SignalAction
 
 logger = get_logger(__name__)
 

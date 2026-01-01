@@ -7,8 +7,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.core.exceptions import BaseAPIException
-from app.core.logging import (
+from app.core.errors import BaseAPIException
+from app.core.logger import (
     clear_request_context,
     get_logger,
     log_api_request,
@@ -17,8 +17,8 @@ from app.core.logging import (
     request_id_ctx,
     user_id_ctx,
 )
+from app.core.policies import INPUT_VALIDATION_CONFIG
 from app.core.security import decode_token
-from app.core.security_constants import INPUT_VALIDATION_CONFIG
 from app.utils import extract_bearer_token, get_client_ip, get_request_context, get_request_size
 
 logger = get_logger(__name__)

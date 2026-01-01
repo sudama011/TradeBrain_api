@@ -1,14 +1,11 @@
-# app/models/user_models.py
-
-
 import uuid
 
-from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String, Text, Uuid
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, String, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
-from app.models.base_model import BaseModel
-from app.models.enums import NotificationType, PlatformType, UserRole
+from app.models.base import BaseModel
+from app.models.types import PlatformType, UserRole
 
 
 class User(BaseModel):
@@ -23,23 +20,6 @@ class User(BaseModel):
     notifications = relationship("Notification", back_populates="user", cascade="all, delete-orphan")
     favorites = relationship("UserSignalFavorite", back_populates="user", cascade="all, delete-orphan")
     trades = relationship("UserTrade", back_populates="user", cascade="all, delete-orphan")
-
-
-class UserDevice(BaseModel):
-    """
-    Stores FCM/APNS tokens for Push Notifications.
-    """
-
-    __tablename__ = "user_devices"
-
-    user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False)
-    token = Column(String, unique=True, nullable=False)  # The FCM Token
-    platform = Column(Enum(PlatformType), nullable=False)
-
-    is_active = Column(Boolean, default=True)
-    last_active_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
-
-    user = relationship("User", back_populates="devices")
 
 
 class UserSession(BaseModel):
@@ -57,21 +37,18 @@ class UserSession(BaseModel):
     user = relationship("User", back_populates="sessions")
 
 
-class Notification(BaseModel):
+class UserDevice(BaseModel):
     """
-    In-App Notification History (The 'Bell' Icon).
+    Stores FCM/APNS tokens for Push Notifications.
     """
 
-    __tablename__ = "notifications"
+    __tablename__ = "user_devices"
 
     user_id: Mapped[uuid.UUID] = mapped_column(Uuid, ForeignKey("users.id"), nullable=False)
+    token = Column(String, unique=True, nullable=False)  # The FCM Token
+    platform = Column(Enum(PlatformType), nullable=False)
 
-    title = Column(String, nullable=False)
-    body = Column(Text, nullable=False)
-    type = Column(Enum(NotificationType), default=NotificationType.SYSTEM, nullable=False)
+    is_active = Column(Boolean, default=True)
+    last_active_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
-    is_read = Column(Boolean, default=False)
-
-    related_signal_id = Column(Uuid, ForeignKey("signals.id"), nullable=True)
-
-    user = relationship("User", back_populates="notifications")
+    user = relationship("User", back_populates="devices")

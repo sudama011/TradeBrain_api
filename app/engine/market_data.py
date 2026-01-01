@@ -11,7 +11,7 @@ import yfinance as yf
 from dotenv import load_dotenv
 from tavily import TavilyClient
 
-from app.core.logging import get_logger
+from app.core.logger import get_logger
 
 load_dotenv()
 

@@ -4,9 +4,9 @@ from typing import Any, Dict, List
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 
-from app.core.config import settings
-from app.core.logging import get_logger
+from app.core.logger import get_logger
 from app.core.security import get_password_hash
+from app.core.settings import settings
 from app.models import User, WatchlistItem
 from app.utils import normalize_email
 

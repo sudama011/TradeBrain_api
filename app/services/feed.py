@@ -3,10 +3,10 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import NotFoundError, handle_exceptions
-from app.core.logging import get_logger
+from app.core.errors import NotFoundError, handle_exceptions
+from app.core.logger import get_logger
 from app.models import Signal
-from app.repositories.signal_repository import signal_repository
+from app.repositories.signal import signal_repository
 from app.schemas import PaginatedResponse, PaginationParams, SignalCreate, SignalResponse, SignalUpdate
 
 logger = get_logger(__name__)

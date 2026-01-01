@@ -1,11 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import BusinessLogicError, NotFoundError, handle_exceptions
-from app.core.logging import get_logger
+from app.core.errors import BusinessLogicError, NotFoundError, handle_exceptions
+from app.core.logger import get_logger
 from app.core.security import get_password_hash
 from app.models import User
 from app.repositories import user_repository
-from app.repositories.base_repository import RelationshipLoading
+from app.repositories.base import RelationshipLoading
 from app.schemas import PaginatedResponse, PaginationParams, UserCreate, UserResponse
 from app.utils import normalize_email
 

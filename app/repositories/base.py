@@ -8,8 +8,8 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import handle_exceptions
-from app.core.logging import get_logger
+from app.core.errors import handle_exceptions
+from app.core.logger import get_logger
 from app.db.query_builder import AsyncQueryBuilder
 
 T = TypeVar("T")

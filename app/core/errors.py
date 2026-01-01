@@ -5,7 +5,7 @@ from fastapi import status
 from sqlalchemy.exc import DatabaseError as SQLAlchemyDatabaseError
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.logging import get_logger, sanitize_log_data
+from app.core.logger import get_logger, sanitize_log_data
 
 logger = get_logger(__name__)
 

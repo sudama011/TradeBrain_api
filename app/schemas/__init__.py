@@ -1,5 +1,5 @@
-from app.schemas.auth_schemas import LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse
-from app.schemas.common_schemas import (
+from app.schemas.auth import LoginRequest, LoginResponse, RefreshTokenRequest, RefreshTokenResponse
+from app.schemas.common import (
     PaginatedResponse,
     PaginationMeta,
     PaginationParams,
@@ -8,9 +8,9 @@ from app.schemas.common_schemas import (
     get_paginated_response,
     get_pagination_meta,
 )
-from app.schemas.signal_schemas import SignalCreate, SignalResponse, SignalUpdate
-from app.schemas.user_schemas import UserCreate, UserResponse
-from app.schemas.watchlist_schemas import (
+from app.schemas.signal import SignalCreate, SignalResponse, SignalUpdate
+from app.schemas.user import UserCreate, UserResponse
+from app.schemas.watchlist import (
     WatchlistBulkUpdate,
     WatchlistItemCreate,
     WatchlistItemResponse,

@@ -4,11 +4,11 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.dependencies import get_session, require_admin
-from app.core.logging import get_logger
+from app.core.deps import get_session, require_admin
+from app.core.logger import get_logger
 from app.models import User
 from app.schemas import PaginatedResponse, PaginationParams, SignalResponse
-from app.schemas.signal_schemas import SignalCreate, SignalUpdate
+from app.schemas.signal import SignalCreate, SignalUpdate
 from app.services import signal_service
 
 router = APIRouter()

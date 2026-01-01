@@ -1,3 +1,8 @@
+"""
+HTTP Request utilities.
+Helpers for extracting IP addresses, tokens, and logging context.
+"""
+
 from typing import Any, Dict, Optional
 
 from fastapi import Request

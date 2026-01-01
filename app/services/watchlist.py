@@ -2,10 +2,10 @@ from typing import List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.logging import get_logger
+from app.core.logger import get_logger
 from app.models import WatchlistItem
 from app.repositories import watchlist_repository
-from app.schemas.watchlist_schemas import (
+from app.schemas.watchlist import (
     WatchlistItemCreate,
     WatchlistItemUpdate,
     WatchlistResponse,

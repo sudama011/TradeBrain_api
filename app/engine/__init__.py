@@ -11,8 +11,8 @@ Note: Import scanner_service and scanner_scheduler directly from their modules
 to avoid circular imports.
 """
 
-from app.scanner.agents import analyze_opportunity
-from app.scanner.tools import check_api_health, get_market_data, get_news_context
+from app.engine.analyst import analyze_opportunity
+from app.engine.market_data import check_api_health, get_market_data, get_news_context
 
 __all__ = [
     "analyze_opportunity",

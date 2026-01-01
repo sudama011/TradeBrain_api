@@ -1,5 +1,5 @@
-from app.utils.formatters import mask_email, normalize_email
-from app.utils.request_utils import (
+from app.utils.formatting import mask_email, normalize_email
+from app.utils.request import (
     extract_bearer_token,
     get_client_ip,
     get_request_context,

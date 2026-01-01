@@ -1,3 +1,7 @@
+"""
+Data formatting and sanitization utilities.
+"""
+
 from pydantic import EmailStr
 
 

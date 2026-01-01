@@ -12,8 +12,8 @@ from typing import Any, Dict, Optional
 
 import google.genai as genai
 
-from app.core.logging import get_logger
-from app.scanner.signal_validator import signal_validator
+from app.core.logger import get_logger
+from app.engine.validator import signal_validator
 
 logger = get_logger(__name__)
 client = genai.Client()

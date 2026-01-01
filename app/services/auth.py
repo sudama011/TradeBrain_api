@@ -3,15 +3,15 @@ from typing import Any, Dict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.config import settings
-from app.core.exceptions import AuthenticationError, handle_exceptions
-from app.core.logging import get_logger
+from app.core.errors import AuthenticationError, handle_exceptions
+from app.core.logger import get_logger
 from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
     verify_password,
 )
+from app.core.settings import settings
 from app.repositories import user_repository
 from app.schemas import LoginResponse, RefreshTokenResponse
 from app.utils import normalize_email

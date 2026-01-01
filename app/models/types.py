@@ -1,4 +1,3 @@
-# app/models/enums.py
 import enum
 
 

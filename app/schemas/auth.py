@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
-from app.schemas.user_schemas import UserResponse
+from app.schemas.user import UserResponse
 
 
 class RefreshTokenRequest(BaseModel):

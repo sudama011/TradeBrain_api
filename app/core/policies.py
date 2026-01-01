@@ -1,8 +1,5 @@
 """
-Security constants and patterns for application security.
-
-Centralized security configuration including suspicious patterns,
-blocked user agents, and security validation rules.
+Security Policies and Rules.
 """
 
 import re
@@ -12,12 +9,9 @@ from typing import Any, Dict, List
 API_SECURITY_CONFIG: Dict[str, Any] = {
     "allow_credentials": True,
     "require_https": False,  # Set to True in production
-    "cors_origins": [
-        "http://localhost:3000",
-        "http://localhost:8000",
-    ],  # Configure based on environment
+    "cors_origins": ["http://localhost:3000", "http://localhost:8000"],  # Configure based on environment
     "cors_methods": ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    "cors_headers": ["Content-Type", "Authorization", "X-Requested-With"],
+    "cors_headers": ["Content-Type", "Authorization"],
     "max_request_timeout": 30,  # seconds
     "enable_request_logging": True,
     "enable_response_compression": True,

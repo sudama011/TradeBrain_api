@@ -12,11 +12,11 @@ from typing import Any, Dict, List, Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.logging import get_logger
+from app.core.logger import get_logger
 from app.db.database import AsyncSessionLocal
+from app.engine import analyze_opportunity, check_api_health, get_market_data, get_news_context
 from app.models import Signal, SignalStatus
 from app.repositories import signal_repository, watchlist_repository
-from app.scanner import analyze_opportunity, check_api_health, get_market_data, get_news_context
 
 logger = get_logger(__name__)
 

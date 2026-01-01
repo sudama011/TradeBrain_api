@@ -10,7 +10,7 @@ from fastapi import Depends
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import AuthenticationError, AuthorizationError, NotFoundError
+from app.core.errors import AuthenticationError, AuthorizationError, NotFoundError
 from app.core.security import decode_token, get_logger
 from app.db.database import get_session
 from app.models import User, UserRole

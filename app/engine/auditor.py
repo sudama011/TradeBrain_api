@@ -11,9 +11,9 @@ from typing import List
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.logging import get_logger
+from app.core.logger import get_logger
+from app.engine.market_data import get_market_data
 from app.models import Signal, SignalAction, SignalStatus
-from app.scanner.tools import get_market_data
 
 logger = get_logger(__name__)
 

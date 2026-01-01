@@ -1,8 +1,5 @@
 """
-Application Configuration
-
-Centralized configuration management using Pydantic settings.
-Loads configuration from environment variables with proper validation.
+Application Configuration.
 """
 
 import os
@@ -10,14 +7,13 @@ import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
-# Load variables from .env file immediately
 load_dotenv()
 
 
 class Settings(BaseSettings):
     APP_NAME: str = "TradeBrain"
     API_VERSION: str = "0.1.0"
-    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")  # Options: dev, prod
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "dev")
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     WORKERS: int = int(os.getenv("WORKERS", 1))
@@ -41,5 +37,4 @@ class Settings(BaseSettings):
     SCANNER_MIN_CONFIDENCE: int = int(os.getenv("SCANNER_MIN_CONFIDENCE", 75))
 
 
-# Global settings instance
 settings = Settings()

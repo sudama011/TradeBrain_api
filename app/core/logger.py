@@ -7,7 +7,7 @@ import structlog
 from structlog.processors import JSONRenderer
 from structlog.stdlib import LoggerFactory
 
-from app.core.config import settings
+from app.core.settings import settings
 
 # Context variables for request correlation
 request_id_ctx: ContextVar[Optional[str]] = ContextVar("request_id", default=None)

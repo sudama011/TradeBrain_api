@@ -7,9 +7,9 @@ from typing import Optional
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import handle_exceptions
+from app.core.errors import handle_exceptions
 from app.models import User
-from app.repositories.base_repository import BaseRepository
+from app.repositories.base import BaseRepository
 
 
 class UserRepository(BaseRepository[User]):
