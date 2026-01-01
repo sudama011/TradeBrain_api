@@ -5,6 +5,7 @@ Pydantic schemas for API request/response validation.
 from datetime import datetime
 from typing import Optional
 from uuid import UUID
+from app.models.types import SignalAction, SignalStatus, SetupType
 
 from pydantic import BaseModel, Field
 
@@ -32,14 +33,15 @@ class SignalUpdate(BaseModel):
     """Schema for updating a signal."""
 
     ticker: Optional[str] = Field(None, min_length=1, max_length=20)
-    action: Optional[str] = Field(None, pattern="^(BUY|SELL|HOLD)$")
+    action: SignalAction = Field(None, description="Trading action")
     confidence: Optional[int] = Field(None, ge=0, le=100)
     entry_price: Optional[float] = Field(None, gt=0)
     target_price: Optional[float] = Field(None, gt=0)
     stop_loss: Optional[float] = Field(None, gt=0)
     reasoning: Optional[str] = Field(None, min_length=10)
     source_url: Optional[str] = None
-
+    status: SignalStatus = Field(default=SignalStatus.ACTIVE)
+    setup_type: SetupType = Field(default=None)
 
 class SignalResponse(SignalBase):
     """Schema for signal response."""
