@@ -75,14 +75,14 @@ def analyze_opportunity(ticker: str, market_data: Dict[str, Any], news_context: 
         "reasoning": "Technical: [Trend]. Catalyst: [Specific News].",
         "time_horizon": "e.g. 3-5 Days",
         "entry_price": {market_data.get('current_price')},
-        "target_price": <Calculated 6-10% profit>,
+        "target_price": <Calculated 6-15% profit>,
         "stop_loss": <Calculated 2-3% risk>
     }}
     """
 
     try:
         # Using the latest flash model for speed and reasoning
-        response = client.models.generate_content(model="gemini-2.0-flash", contents=prompt)
+        response = client.models.generate_content(model="gemini-2.5-flash", contents=prompt)
         text = response.text.replace("```json", "").replace("```", "").strip()
 
         # 1. Handle Rejection (AI decided it's a bad trade)

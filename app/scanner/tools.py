@@ -23,14 +23,7 @@ tavily = TavilyClient(api_key=TAVILY_API_KEY) if TAVILY_API_KEY else None
 
 def get_market_data(ticker: str) -> Optional[Dict]:
     """
-    Fetches the last 5 days of price data to determine trend.
-
-    Args:
-        ticker: Stock ticker symbol (e.g., 'TATASTEEL')
-
-    Returns:
-        Dictionary with current_price, change_pct, trend, volume_avg
-        or None if data couldn't be fetched.
+    Fetches the last 5 days of price data.
     """
     try:
         # Append .NS for NSE stocks if not present
@@ -44,12 +37,16 @@ def get_market_data(ticker: str) -> Optional[Dict]:
             logger.warning("empty_market_data", ticker=ticker)
             return None
 
-        current_price = hist["Close"].iloc[-1]
-        prev_close = hist["Close"].iloc[-2]
+        latest = hist.iloc[-1]
+        prev_close = hist["Close"].iloc[-2] if len(hist) > 1 else latest["Open"]
+
+        current_price = latest["Close"]
         change_pct = ((current_price - prev_close) / prev_close) * 100
 
         return {
             "current_price": round(current_price, 2),
+            "day_high": round(latest["High"], 2),
+            "day_low": round(latest["Low"], 2),
             "change_pct": round(change_pct, 2),
             "trend": "UP" if change_pct > 0 else "DOWN",
             "volume_avg": int(hist["Volume"].mean()),

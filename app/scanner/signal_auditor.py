@@ -45,64 +45,78 @@ class SignalAuditor:
         return stats
 
     async def _audit_single_signal(self, signal: Signal, session: AsyncSession, stats: dict) -> None:
-        """Audits a single signal."""
+        """
+        Audits a single signal using High/Low/Close data.
+        """
         try:
-            # Check Timeouts first (cheapest check)
+            # 1. Check Timeouts (Cheapest check first)
             if signal.expires_at and datetime.now(timezone.utc) > signal.expires_at:
                 signal.status = SignalStatus.TIMED_OUT
                 await session.merge(signal)
                 await session.commit()
                 stats["timeouts"] += 1
-                logger.info("signal_timed_out", ticker=signal.ticker, id=str(signal.id))
+                logger.info("signal_timed_out", ticker=signal.ticker)
                 return
 
-            # Fetch live price
+            # 2. Fetch Live Market Data
             market_data = get_market_data(signal.ticker)
             if not market_data:
-                logger.warning("audit_no_market_data", ticker=signal.ticker)
                 return
 
+            # Extract OHLC data (fallback to current_price if high/low missing)
             cmp = market_data.get("current_price")
-            if not cmp:
-                return
+            day_high = market_data.get("day_high", cmp)
+            day_low = market_data.get("day_low", cmp)
 
-            # --- Logic for PENDING Signals (Waiting for Entry) ---
+            outcome = None
+
+            # --- CASE A: PENDING SIGNALS (Waiting for Entry) ---
             if signal.status == SignalStatus.PENDING:
-                # If price crossed entry, activate it
-                # For BUY: If Low <= Entry <= High (approximated by CMP crossing Entry)
-                # Simple logic: If CMP is now below Entry (for BUY) or above (for SELL), we triggered.
                 triggered = False
-                if signal.action == SignalAction.BUY and cmp <= signal.entry_price:
-                    triggered = True
-                elif signal.action == SignalAction.SELL and cmp >= signal.entry_price:
-                    triggered = True
+
+                if signal.action == SignalAction.BUY:
+                    # Buy Limit/Dip: Did price drop to our entry?
+                    if day_low <= signal.entry_price:
+                        triggered = True
+
+                elif signal.action == SignalAction.SELL:
+                    # Sell Limit/Rally: Did price rise to our entry?
+                    if day_high >= signal.entry_price:
+                        triggered = True
 
                 if triggered:
                     signal.status = SignalStatus.ACTIVE
                     await session.merge(signal)
                     await session.commit()
                     stats["activated"] += 1
-                    logger.info("signal_activated", ticker=signal.ticker, price=cmp)
+                    logger.info("signal_activated", ticker=signal.ticker, entry=signal.entry_price)
                 return
 
-            # --- Logic for ACTIVE Signals (Live Trade) ---
+            # --- CASE B: ACTIVE SIGNALS (Live Trade Management) ---
             if signal.status == SignalStatus.ACTIVE:
-                outcome = None
 
                 if signal.action == SignalAction.BUY:
-                    if cmp >= signal.target_price:
-                        outcome = SignalStatus.HIT_TARGET
-                    elif cmp <= signal.stop_loss:
+                    # 1. Check Stop Loss FIRST (Conservative approach)
+                    if day_low <= signal.stop_loss:
                         outcome = SignalStatus.HIT_STOP_LOSS
+                    # 2. Check Target
+                    elif day_high >= signal.target_price:
+                        outcome = SignalStatus.HIT_TARGET
 
                 elif signal.action == SignalAction.SELL:
-                    if cmp <= signal.target_price:
-                        outcome = SignalStatus.HIT_TARGET
-                    elif cmp >= signal.stop_loss:
+                    # 1. Check Stop Loss FIRST
+                    if day_high >= signal.stop_loss:
                         outcome = SignalStatus.HIT_STOP_LOSS
+                    # 2. Check Target
+                    elif day_low <= signal.target_price:
+                        outcome = SignalStatus.HIT_TARGET
 
+                # Apply Outcome
                 if outcome:
                     signal.status = outcome
+                    # Optional: Record the specific price that triggered it
+                    exit_price = signal.stop_loss if outcome == SignalStatus.HIT_STOP_LOSS else signal.target_price
+
                     await session.merge(signal)
                     await session.commit()
 
@@ -111,7 +125,7 @@ class SignalAuditor:
                     else:
                         stats["losses"] += 1
 
-                    logger.info("signal_closed", ticker=signal.ticker, outcome=outcome, close_price=cmp)
+                    logger.info("signal_closed", ticker=signal.ticker, outcome=outcome, exit_price=exit_price)
 
         except Exception as e:
             logger.error("audit_error", ticker=signal.ticker, error=str(e))
