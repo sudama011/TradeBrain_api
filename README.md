@@ -4,16 +4,27 @@
 
 Unlike simple screeners, TradeBrain acts as a disciplined analyst: checking Technicals, Fundamentals, and News Catalysts before generating a signal. It combines real-time market data, AI-driven analysis, and automated risk management to deliver actionable trading setups.
 
+---
+
+## 📚 Documentation Hub
+
+* **[🏛️ System Architecture](docs/architecture.md)**
+    * The "Brain" of the system. Explains the Discovery → Analysis → Validation → Audit pipeline.
+* **[🗄️ Domain Models & Database](docs/domain_models.md)**
+    * The Source of Truth for the DB Schema, Enums, Indexes, and Integrity Rules.
+* **[🔌 API Specification](docs/api_spec.md)**
+    * Detailed Endpoint definitions with **Request/Response JSON examples**.
+
+---
+
 ## 🚀 Core Features
 
-* **24/7 Market Scanning**: Automatically monitors a custom watchlist of tickers and discovers new "stocks in play" through news analysis.
-* **Triple Confirmation Analysis**: Every opportunity is analyzed across Technical, Fundamental, and Catalyst layers using AI.
-* **Smart Optimization Engine**: Built-in "Gatekeeper" prevents redundant AI calls by skipping scans when price action or news hasn't changed (saves API costs).
-* **Risk Management ("Math Police")**: Dedicated validation layer ensures every signal meets strict financial logic (1:2 Risk/Reward minimum).
-* **Automated Auditing**: Background engine tracks active signals against live prices to determine if they hit targets or stop losses.
-* **Paper Trading**: Users can "take" a signal to create a paper trade and track performance.
-* **Notifications**: Real-time alerts for new signals, target hits, and stop losses.
-* **Admin Tools**: Seed data, manage users, and monitor system health.
+* **24/7 Market Scanning**: Autonomous background workers monitor watchlists and "Stocks in Play".
+* **Triple Confirmation**: AI Analysis based on Technicals + Fundamentals + Catalysts.
+* **Optimization Engine**: Smart caching prevents redundant AI calls (checks price variance < 0.5%).
+* **Risk Management**: "Math Police" validation (e.g., Risk/Reward ≥ 1:2) enforced before DB entry.
+* **Signal Auditing**: Automated "The Truth" checks against live prices to update signal status.
+* **Paper Trading**: Virtual portfolio management to track signal performance.
 
 ---
 
@@ -120,12 +131,3 @@ docker-compose up -d
 # API will be available at localhost:8000
 
 ```
-
----
-
-## 📚 Documentation
-
-* **[Architecture](https://www.google.com/search?q=docs/architecture.md)** - System design & data flow
-* **[API Reference](https://www.google.com/search?q=docs/api.md)** - Complete endpoint documentation
-* **[Models](https://www.google.com/search?q=docs/models.md)** - Database schema documentation
-* **[Implementation](https://www.google.com/search?q=docs/implementation.md)** - Technical implementation details
