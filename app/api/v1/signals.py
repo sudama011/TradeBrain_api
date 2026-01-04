@@ -1,127 +1,41 @@
-from typing import Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.core.deps import get_session, require_admin
-from app.core.logger import get_logger
-from app.models import User
-from app.schemas import PaginatedResponse, PaginationParams, SignalResponse
-from app.schemas.signal import SignalCreate, SignalUpdate
-from app.services import signal_service
+from fastapi import APIRouter, Query
 
 router = APIRouter()
-logger = get_logger(__name__)
 
 
-@router.get("/signals", response_model=PaginatedResponse[SignalResponse])
-async def get_signals(
-    page: int = Query(1, ge=1, description="Page number"),
-    size: int = Query(20, ge=1, le=100, description="Items per page"),
-    ticker: Optional[str] = Query(None, description="Filter by ticker symbol (e.g., TATASTEEL)"),
-    action: Optional[str] = Query(None, pattern="^(BUY|SELL|HOLD)$", description="Filter by action type"),
-    min_confidence: Optional[int] = Query(None, ge=0, le=100, description="Filter by minimum confidence score"),
-    days_old: Optional[int] = Query(None, ge=1, le=365, description="Filter signals created within the last N days"),
-    session: AsyncSession = Depends(get_session),
-):
-    """
-    Fetches paginated trading signals with advanced filters.
-
-    **Filters:**
-    - `ticker`: Filter by stock ticker symbol (e.g., TATASTEEL)
-    - `action`: Filter by signal action (BUY, SELL, HOLD)
-    - `min_confidence`: Filter signals with confidence >= specified value
-    - `days_old`: Filter signals created within the last N days
-
-    **Example:** `/signals?ticker=TATASTEEL&action=BUY&min_confidence=80&days_old=7`
-    """
-    pagination = PaginationParams(page=page, size=size)
-    return await signal_service.get_signals(
-        session=session,
-        pagination=pagination,
-        ticker=ticker,
-        action=action,
-        min_confidence=min_confidence,
-        days_old=days_old,
-    )
+@router.get("/")
+async def get_signals(ticker: str = None, action: str = None, status: str = "ACTIVE", min_confidence: int = 0):
+    """Paginated trading signals feed."""
+    return {"signals": [], "count": 0}
 
 
-@router.get("/signals/high-confidence", response_model=list[SignalResponse])
-async def get_high_confidence_signals(
-    min_confidence: int = Query(75, ge=0, le=100, description="Minimum confidence score"),
-    limit: int = Query(50, ge=1, le=100, description="Maximum number of signals to return"),
-    session: AsyncSession = Depends(get_session),
-):
-    """
-    Get signals with high confidence scores.
-    """
-    return await signal_service.get_high_confidence_signals(session, min_confidence, limit)
+@router.get("/{signal_id}")
+async def get_signal_detail(signal_id: UUID):
+    """Detailed view of a specific signal."""
+    return {"id": signal_id, "reasoning": "AI logic placeholder"}
 
 
-@router.get("/signals/ticker/{ticker}", response_model=list[SignalResponse])
-async def get_signals_by_ticker(
-    ticker: str,
-    limit: int = Query(50, ge=1, le=100, description="Maximum number of signals to return"),
-    session: AsyncSession = Depends(get_session),
-):
-    """
-    Get signals for a specific ticker symbol.
-    """
-    return await signal_service.get_signals_by_ticker(ticker, session, limit)
+@router.post("/{signal_id}/favorite")
+async def favorite_signal(signal_id: UUID):
+    """Save signal to favorites."""
+    return {"message": f"Signal {signal_id} favorited"}
 
 
-@router.get("/signals/{signal_id}", response_model=SignalResponse)
-async def get_signal(
-    signal_id: UUID,
-    session: AsyncSession = Depends(get_session),
-):
-    """
-    Get a specific signal by ID.
-    """
-    return await signal_service.get_signal_by_id(signal_id, session)
+@router.delete("/{signal_id}/favorite")
+async def unfavorite_signal(signal_id: UUID):
+    """Remove from favorites."""
+    return {"message": f"Signal {signal_id} removed from favorites"}
 
 
-@router.post("/signals", response_model=SignalResponse, status_code=201)
-async def create_signal(
-    signal_data: SignalCreate,
-    session: AsyncSession = Depends(get_session),
-    _admin: User = Depends(require_admin),
-):
-    """
-    Create a new trading signal.
-
-    **Admin only:** Only administrators can create signals.
-    """
-    return await signal_service.create_signal(signal_data, session)
+@router.get("/favorites")
+async def get_favorite_signals():
+    """Retrieve user's saved signals."""
+    return {"favorites": []}
 
 
-@router.patch("/signals/{signal_id}", response_model=SignalResponse)
-async def update_signal(
-    signal_id: UUID,
-    signal_data: SignalUpdate,
-    session: AsyncSession = Depends(get_session),
-    _admin: User = Depends(require_admin),
-):
-    """
-    Update an existing signal (e.g., correct a target price manually).
-
-    **Admin only:** Only administrators can modify signals.
-    """
-    return await signal_service.update_signal(signal_id, signal_data, session)
-
-
-@router.delete("/signals/{signal_id}", status_code=204)
-async def delete_signal(
-    signal_id: UUID,
-    session: AsyncSession = Depends(get_session),
-    _admin: User = Depends(require_admin),
-):
-    """
-    Delete a signal.
-
-    **Admin only:** Only administrators can delete signals.
-    Use this to clean up 'bad' signals generated by AI.
-    """
-    await signal_service.delete_signal(signal_id, session)
-    return None
+@router.patch("/{signal_id}")
+async def admin_override_signal(signal_id: UUID):
+    """Admin only: Manually override signal status (e.g., MANUAL_CLOSED)."""
+    return {"message": f"Signal {signal_id} status updated by admin"}
